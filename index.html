@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.8 -->
+<!-- LUMIIA REDA SPIN — v3.8b -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.8</div>
+  <div class="tb-v">v3.8b</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -1828,7 +1828,7 @@ function closeOverlay() {
     const attSub = document.getElementById('attente-sub');
     if (attSub) {
       attSub.style.display = 'block';
-      attSub.innerHTML = 'Merci d’avoir joué ! 🎊<br><button onclick="window.close();history.back();" style="margin-top:10px;padding:10px 24px;border:1px solid rgba(255,255,255,.2);border-radius:50px;background:rgba(255,255,255,.08);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">✕ Fermer le jeu</button>';
+      attSub.innerHTML = `Merci d’avoir joué ! 🎊<br><button onclick="window.close();history.back();" style="margin-top:10px;padding:10px 24px;border:1px solid rgba(255,255,255,.2);border-radius:50px;background:rgba(255,255,255,.08);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">✕ Fermer le jeu</button>`;
     }
     return;
   }
