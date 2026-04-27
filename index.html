@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v2.1 -->
+<!-- LUMIIA REDA SPIN — v2.2 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -46,25 +46,29 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 
 /* ── BANDEAU PERMANENT ── */
 #bandeau{
-  height:40px;flex-shrink:0;
+  height:52px;flex-shrink:0;
   background:linear-gradient(90deg,rgba(77,217,232,.12),rgba(168,85,247,.12));
   border-bottom:1px solid var(--bd);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 18px;position:fixed;top:0;left:0;right:0;z-index:300;
+  padding:0 22px;position:fixed;top:0;left:0;right:0;z-index:300;
 }
 #bandeau-left{
-  font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.18em;
+  flex:1;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(1rem, 2.2vw, 1.5rem);
+  letter-spacing:.22em;
   background:linear-gradient(90deg,var(--cyan),var(--mag));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  white-space:nowrap;
 }
-#bandeau-right{font-size:.7rem;color:var(--dim);letter-spacing:.08em;}
+#bandeau-right{font-size:.75rem;color:var(--dim);letter-spacing:.08em;white-space:nowrap;padding-left:16px;}
 #bandeau-right a{color:var(--cyan);text-decoration:none;}
 
 /* ── TOPBAR ── */
 #topbar{
   height:46px;background:rgba(5,0,26,.95);border-bottom:1px solid var(--bd);
   display:flex;align-items:center;
-  position:fixed;top:40px;left:0;right:0;z-index:200;
+  position:fixed;top:52px;left:0;right:0;z-index:200;
 }
 .tb-logo{
   padding:0 14px;font-family:'Bebas Neue',sans-serif;font-size:.8rem;
@@ -90,7 +94,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 .tb-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
 
 /* ── VUES ── */
-.view{display:none;position:fixed;top:86px;left:0;right:0;bottom:0;}
+.view{display:none;position:fixed;top:98px;left:0;right:0;bottom:0;}
 .view.active{display:flex;}
 
 /* ══════════════════════════════════
@@ -99,7 +103,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 #view-proj{background:var(--deep);}
 #proj-grid{
   width:100%;height:100%;
-  display:grid;grid-template-columns:270px 1fr 300px;overflow:hidden;
+  display:grid;grid-template-columns:300px 1fr 340px;overflow:hidden;
 }
 
 /* Gauche */
@@ -348,7 +352,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
    SETTINGS
 ══════════════════════════════════ */
 #settings-panel{
-  position:fixed;top:86px;right:0;bottom:0;width:min(500px,92vw);
+  position:fixed;top:98px;right:0;bottom:0;width:min(500px,92vw);
   background:var(--panel);border-left:2px solid var(--violet);
   z-index:400;overflow-y:auto;padding:24px;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);
@@ -441,7 +445,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v2.1</div>
+  <div class="tb-v">v2.2</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -482,8 +486,38 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
     <div id="col-centre">
       <div class="centre-bg"></div>
       <div id="wait-msg">
-        <h2>EN ATTENTE</h2>
-        <p>Sélectionne un joueur <strong style="color:var(--ok);">Validé</strong><br>dans la liste pour lancer la roue</p>
+        <h2>LUMIIA REDA SPIN</h2>
+        <div style="
+          max-width:580px;margin:0 auto;
+          background:rgba(255,255,255,.04);border:1px solid var(--bd);
+          border-radius:20px;padding:32px 36px;text-align:left;margin-top:16px;
+        ">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.14em;color:var(--cyan);margin-bottom:18px;text-align:center;">
+            🎯 RÈGLES DU JEU
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--cyan);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div><strong style="color:var(--tx);">Scanne le QR code</strong><br><span style="color:var(--soft);font-size:.82rem;">Inscris ton prénom, ton entreprise et ton email</span></div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--violet);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div><strong style="color:var(--tx);">Choisis ta catégorie de quiz</strong><br><span style="color:var(--soft);font-size:.82rem;">Musique, Sport, Cinéma, Histoire, Géographie, Science, Cuisine ou Culture G.</span></div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--mag);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div><strong style="color:var(--tx);">Réponds aux 5 questions</strong><br><span style="color:var(--soft);font-size:.82rem;">Tu as 15 secondes par question. Il faut toutes les réussir pour gagner.</span></div>
+            </div>
+            <div style="display:flex;gap:14px;align-items:flex-start;">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--lime);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+              <div><strong style="color:var(--tx);">Lance la roue !</strong><br><span style="color:var(--soft);font-size:.82rem;">Reviens au stand — l'animateur te sélectionne et tu tournes la roue pour gagner un cadeau LUMIIA.</span></div>
+            </div>
+          </div>
+          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--bd);text-align:center;font-size:.75rem;color:var(--dim);">
+            Tentatives illimitées · Gratuit · Cadeaux à gagner
+          </div>
+        </div>
+        <p style="margin-top:18px;font-size:.78rem;color:var(--dim);">Sélectionne un joueur <strong style="color:var(--ok);">Validé ✅</strong> dans la liste pour lancer la roue</p>
       </div>
       <div id="roue-zone">
         <div class="roue-joueur-label" id="roue-joueur-lbl">—</div>
@@ -628,6 +662,10 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <div id="settings-panel">
   <button class="sp-close" onclick="toggleSettings()">✕</button>
   <div class="sp-title">⚙ SETTINGS</div>
+  <div class="sp-sec">
+    <div class="sp-sec-lbl">👥 Participants (<span id="sp-nb-j">0</span>)</div>
+    <div id="sp-joueurs-list" style="display:flex;flex-direction:column;gap:3px;max-height:240px;overflow-y:auto;"></div>
+  </div>
   <div class="sp-sec">
     <div class="sp-sec-lbl">🎁 Lots de la roue (modifiables)</div>
     <div class="sp-lots" id="sp-lots"></div>
@@ -886,7 +924,18 @@ function init() {
     document.getElementById('view-proj').classList.remove('active');
     // Récupérer clé stockée
     myKey = localStorage.getItem('llspin_key');
-    if (myKey && joueurs[myKey]) restorePlayerState();
+    // Toujours montrer l'inscription en premier
+    // Si session précédente trouvée, proposer un lien "Reprendre"
+    if (myKey) {
+      const link = document.createElement('div');
+      link.style.cssText = 'font-size:.65rem;color:var(--dim);text-align:center;margin-top:4px;cursor:pointer;text-decoration:underline;';
+      link.textContent = 'D\u00e9j\u00e0 inscrit\u00b7e ? Reprendre ma session';
+      link.onclick = () => {
+        if (joueurs[myKey]) restorePlayerState();
+        else link.textContent = 'Session introuvable\u2026';
+      };
+      document.querySelector('#ps-inscription .p-inner')?.appendChild(link);
+    }
     initFB();
   } else {
     initFB();
@@ -1090,7 +1139,7 @@ const CIRC = 2 * Math.PI * 35;
 
 function getWheelSize() {
   const c = document.getElementById('col-centre');
-  return Math.min((c ? c.offsetWidth : 600) - 80, 500);
+  return Math.min((c ? c.offsetWidth : 800) - 80, 720);
 }
 
 function drawWheel(canvasId, size, angle) {
@@ -1324,6 +1373,24 @@ function toggleSettings() {
 }
 
 function buildSettingsUI() {
+  // Joueurs
+  const spj = document.getElementById('sp-joueurs-list');
+  const nb = document.getElementById('sp-nb-j');
+  const entries = Object.values(joueurs).sort((a,b) => (b.ts||0)-(a.ts||0));
+  if (nb) nb.textContent = entries.length;
+  const badgeColor = { inscrit:'var(--dim)', quiz:'var(--or)', valide:'var(--ok)', perdu:'#ff8888', gagne:'var(--violet)' };
+  const badgeTxt = { inscrit:'Inscrit', quiz:'\u23F3 Quiz', valide:'\u2705 Valid\u00e9', perdu:'Tentative', gagne:'\uD83C\uDFC6 Gagn\u00e9' };
+  if (spj) spj.innerHTML = entries.length ? entries.map(j => `
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--bd);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:800;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(j.nom)}</div>
+        <div style="font-size:.62rem;color:var(--dim);">${esc(j.co||'')}</div>
+      </div>
+      <div style="font-size:.62rem;color:${badgeColor[j.status||'inscrit']};white-space:nowrap;">${badgeTxt[j.status||'inscrit']}</div>
+    </div>`).join('')
+    : `<div style="font-size:.72rem;color:var(--dim);text-align:center;padding:8px;">Aucun participant</div>`;
+
+  // Lots
   const c = document.getElementById('sp-lots');
   c.innerHTML = '';
   LOTS.forEach((lot, i) => {
