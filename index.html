@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.5 -->
+<!-- LUMIIA REDA SPIN — v3.6 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.5</div>
+  <div class="tb-v">v3.6</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -555,7 +555,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       </div><!-- /roue-side -->
       <!-- Lots side -->
       <div id="lots-side">
-        <canvas id="lots-mini-wheel" width="120" height="120" style="display:block;border-radius:50%;box-shadow:0 0 18px rgba(168,85,247,.3);flex-shrink:0;"></canvas>
+        <div style="font-size:3.5rem;text-align:center;filter:drop-shadow(0 0 8px rgba(168,85,247,.5));">🎡</div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.14em;color:var(--cyan);padding:6px 0 6px;border-bottom:1px solid var(--bd);">LES 8 LOTS</div>
         <div id="legende-lots" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div><!-- /lots-side -->
@@ -1275,7 +1275,6 @@ function initFB() {
       }
       drawWheel('proj-canvas', getWheelSize(), wheelAngle);
       drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
-      drawWheel('lots-mini-wheel', 120, 0);
       renderLegende();
     });
   } catch(e) { console.warn('FB', e); }
@@ -1643,9 +1642,12 @@ function playerSpin() {
 
 function playerSpinDone(target) {
   sfxWin();
+  launchConfetti();
   const lot = LOTS[target];
   if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'gagne', lot });
-  // Afficher le lot sur l'écran joueur
+  // Popup overlay (même que projection)
+  showOverlay(myKey ? (joueurs[myKey]?.nom || '') : '', lot, LOT_EMOJIS[target]);
+  // Écran attente derrière le popup
   const msgEl  = document.getElementById('attente-msg');
   const subEl  = document.getElementById('attente-sub');
   const boxEl  = document.getElementById('attente-lot-box');
@@ -1679,7 +1681,6 @@ function animateSpin(target, joueurKey) {
     wheelAngle = a % (2 * Math.PI);
     drawWheel('proj-canvas', sz, wheelAngle);
     drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
-    drawWheel('lots-mini-wheel', 120, wheelAngle);
     if (p < 1) { if (Math.random() < 0.05) sfxSpin(); requestAnimationFrame(frame); }
     else onSpinEnd(target, joueurKey);
   }
@@ -1754,15 +1755,12 @@ function closeOverlay() {
 // RENDER JOUEURS
 // ══════════════════════
 function renderLegende() {
-  drawWheel('lots-mini-wheel', 120, wheelAngle);
   const proj = document.getElementById('legende-lots');
   if (proj) proj.innerHTML = LOTS.map((lot, i) => `
     <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">
       <div style="width:36px;height:36px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;flex-shrink:0;font-weight:700;">${i+1}</div>
       <span style="font-size:1.05rem;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lot)}</span>
     </div>`).join('');
-  // Mini roue lots-side
-  drawWheel('lots-mini-wheel', 120, 0);
   const pl = document.getElementById('player-legende');
   if (pl) pl.innerHTML = LOTS.map((lot, i) => `
     <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06);">
