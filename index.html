@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.10 -->
+<!-- LUMIIA REDA SPIN — v3.11 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.10</div>
+  <div class="tb-v">v3.11</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -614,8 +614,8 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
         <div class="p-title">Bienvenue !</div>
         <div class="p-sub">Inscris-toi pour jouer au quiz et tenter de gagner un cadeau <span style="color:var(--lime);">LUMIIA</span></div>
         <div class="p-field">
-          <label class="p-label">Prénom</label>
-          <input class="p-input" id="p-nom" type="text" placeholder="Ton prénom" autocomplete="given-name">
+          <label class="p-label">Nom et Prénom</label>
+          <input class="p-input" id="p-nom" type="text" placeholder="Ton nom et prénom" autocomplete="name">
         </div>
         <div class="p-field">
           <label class="p-label">Entreprise</label>
@@ -1245,7 +1245,7 @@ const FB_CFG = {
 const FB_PATH = 'redaspin';
 let db = null;
 
-let STOCKS = [1,1,1,1,1,1,1,1]; // stock par lot (0 = illimité)
+let STOCKS = [1,1,1,1,1,-1,1,1]; // stock par lot (-1 = infini, 0 = épuisé)
 let LOT_FALLBACK = 'Bon pour un cocktail au choix au LUMIIA Bar';
 let LOTS = [
   `Session karaok\u00e9 room 3 pers.`,
@@ -1272,7 +1272,7 @@ try {
   const saved = JSON.parse(localStorage.getItem('llspin_defaults') || 'null');
   if (saved) {
     if (saved.lots) LOTS = saved.lots;
-    if (saved.stocks) STOCKS = saved.stocks;
+    if (saved.stocks) STOCKS = saved.stocks; // -1=infini
     if (saved.fallback) LOT_FALLBACK = saved.fallback;
     if (saved.duree) cfg.duree = saved.duree;
   }
@@ -1761,12 +1761,13 @@ function onSpinEnd(target, joueurKey) {
   const psbtn = document.getElementById('player-spin-btn');
   if (psbtn) psbtn.disabled = false;
   sfxWin();
-  // Si stock épuisé → fallback
+  // Stock : -1=infini, 0=épuisé→fallback, >0=décrémenter
   const lot = (STOCKS[target] === 0) ? LOT_FALLBACK : LOTS[target];
   if (STOCKS[target] > 0) {
     STOCKS[target]--;
     if (db) db.ref(FB_PATH + '/settings/stocks').set(STOCKS);
   }
+  // -1 = infini : pas de décrémentation
   const j = joueurs[joueurKey];
   const nom = j ? j.nom : '?';
   // Sauvegarder
@@ -1856,8 +1857,7 @@ function renderLegende() {
   if (proj) proj.innerHTML = LOTS.map((lot, i) => `
     <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">
       <div style="width:36px;height:36px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;flex-shrink:0;font-weight:700;">${i+1}</div>
-      <span style="font-size:1.05rem;font-weight:700;color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lot)}</span>
-      ${lotCounts[i] > 0 ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;background:rgba(184,255,60,.15);color:var(--lime);border:1px solid rgba(184,255,60,.3);border-radius:50px;padding:1px 8px;flex-shrink:0;">${lotCounts[i]}x</span>` : ''}
+      <span style="font-size:.9rem;font-weight:700;color:var(--tx);flex:1;line-height:1.25;word-break:break-word;">${esc(lot)}</span>
     </div>`).join('');
   const pl = document.getElementById('player-legende');
   if (pl) pl.innerHTML = LOTS.map((lot, i) => `
@@ -1989,11 +1989,21 @@ function buildSettingsUI() {
   LOTS.forEach((lot, i) => {
     const row = document.createElement('div');
     row.className = 'sp-lot-row';
+    const wins = Object.values(joueurs).filter(j=>j.status==='gagne'&&j.lot===lot).length;
+    const stockVal = STOCKS[i];
     row.innerHTML = `
       <div class="sp-lot-num" style="background:${LOT_COLORS[i]}">${i+1}</div>
       <input class="sp-input" id="sp-lot-${i}" value="${esc(lot)}" style="flex:1">
-      <input type="number" class="sp-input" id="sp-stock-${i}" value="${STOCKS[i]||0}" min="0" max="99" style="width:54px;text-align:center;" title="Stock (0=illimité)">
-      <div style="font-size:.6rem;color:var(--dim);white-space:nowrap;">stk</div>
+      <select class="sp-input" id="sp-stock-${i}" style="width:68px;text-align:center;padding:4px 6px;" title="Stock">
+        <option value="-1" ${stockVal===-1?'selected':''}>∞</option>
+        <option value="0" ${stockVal===0?'selected':''}>0</option>
+        <option value="1" ${stockVal===1?'selected':''}>1</option>
+        <option value="2" ${stockVal===2?'selected':''}>2</option>
+        <option value="3" ${stockVal===3?'selected':''}>3</option>
+        <option value="5" ${stockVal===5?'selected':''}>5</option>
+        <option value="10" ${stockVal===10?'selected':''}>10</option>
+      </select>
+      <div style="font-size:.65rem;color:${wins>0?'var(--lime)':'var(--dim)'};white-space:nowrap;min-width:28px;text-align:center;" title="Gagnés ce soir">${wins>0?wins+'x':'—'}</div>
     `;
     c.appendChild(row);
   });
@@ -2004,7 +2014,7 @@ function buildSettingsUI() {
 function saveSettings() {
   LOTS = Array.from({length: 8}, (_, i) => document.getElementById(`sp-lot-${i}`)?.value || LOTS[i]);
   cfg.duree = parseInt(document.getElementById('sp-duree').value) || 15;
-  STOCKS = Array.from({length:8},(_,i)=>parseInt(document.getElementById('sp-stock-'+i)?.value)||0);
+  STOCKS = Array.from({length:8},(_,i)=>{ const v=document.getElementById('sp-stock-'+i)?.value; return v==='-1'?-1:(parseInt(v)||0); });
   LOT_FALLBACK = document.getElementById('sp-fallback')?.value || LOT_FALLBACK;
   if (db) db.ref(`${FB_PATH}/settings`).set({ lots: LOTS, duree: cfg.duree, stocks: STOCKS, fallback: LOT_FALLBACK });
   try { localStorage.setItem('llspin_defaults', JSON.stringify({ lots: LOTS, stocks: STOCKS, fallback: LOT_FALLBACK, duree: cfg.duree })); } catch(e) {}
