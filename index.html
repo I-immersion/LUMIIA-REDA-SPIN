@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.9b -->
+<!-- LUMIIA REDA SPIN — v3.10 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.9b</div>
+  <div class="tb-v">v3.10</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -483,7 +483,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   </div>
   <div class="tb-sp"></div>
   <div class="tb-right">
-    <div style="font-size:.65rem;color:var(--dim);padding:0 10px;border-right:1px solid var(--bd);">🎁 <span id="tb-lots-counter" style="color:var(--lime);font-weight:700;">0</span><span style="color:var(--dim);"> / 8 lots</span></div>
+    <div style="font-size:.65rem;color:var(--dim);padding:0 10px;border-right:1px solid var(--bd);">🎁 <span id="tb-lots-counter" style="color:var(--lime);font-weight:700;">0</span><span style="color:var(--dim);"> gagnant(s)</span></div>
     <a href="https://lumiia.fr" target="_blank" style="font-size:.75rem;color:var(--cyan);text-decoration:none;font-weight:700;letter-spacing:.05em;padding:0 12px;border-right:1px solid var(--bd);">lumiia.fr ↗</a>
     <button class="tb-btn" onclick="toggleSettings()">⚙ Settings</button>
     <button class="tb-btn danger" onclick="resetAll()">↺ Reset</button>
@@ -1840,12 +1840,24 @@ function closeOverlay() {
 // ══════════════════════
 // RENDER JOUEURS
 // ══════════════════════
+function getLotCounts() {
+  const counts = new Array(LOTS.length).fill(0);
+  Object.values(joueurs).forEach(j => {
+    if (j.status === 'gagne' && j.lot) {
+      const idx = LOTS.findIndex(l => l === j.lot);
+      if (idx >= 0) counts[idx]++;
+    }
+  });
+  return counts;
+}
 function renderLegende() {
+  const lotCounts = getLotCounts();
   const proj = document.getElementById('legende-lots');
   if (proj) proj.innerHTML = LOTS.map((lot, i) => `
     <div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);">
       <div style="width:36px;height:36px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;flex-shrink:0;font-weight:700;">${i+1}</div>
-      <span style="font-size:1.05rem;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lot)}</span>
+      <span style="font-size:1.05rem;font-weight:700;color:var(--tx);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lot)}</span>
+      ${lotCounts[i] > 0 ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:.85rem;background:rgba(184,255,60,.15);color:var(--lime);border:1px solid rgba(184,255,60,.3);border-radius:50px;padding:1px 8px;flex-shrink:0;">${lotCounts[i]}x</span>` : ''}
     </div>`).join('');
   const pl = document.getElementById('player-legende');
   if (pl) pl.innerHTML = LOTS.map((lot, i) => `
@@ -1921,6 +1933,8 @@ function updateStats() {
   const nbGagnes = vals.filter(j => j.status === 'gagne').length;
   const tbC = document.getElementById('tb-lots-counter');
   if (tbC) tbC.textContent = nbGagnes;
+  // Mettre à jour la légende avec les comptages
+  if (!isPlayerMode) renderLegende();
   document.getElementById('s-inscrits').textContent = vals.length;
   document.getElementById('s-valides').textContent = vals.filter(j => j.status === 'valide').length;
   document.getElementById('s-gagnes').textContent = vals.filter(j => j.status === 'gagne').length;
