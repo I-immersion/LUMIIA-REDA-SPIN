@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.7 -->
+<!-- LUMIIA REDA SPIN — v3.8 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.7</div>
+  <div class="tb-v">v3.8</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -720,37 +720,41 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 
 <!-- ══ VUE TIRAGE AU SORT ══ -->
 <div class="view" id="view-tirage" style="background:var(--deep);flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
-  <div style="position:relative;z-index:2;width:100%;max-width:900px;padding:30px;text-align:center;">
+  <!-- Layout 2 colonnes : liste gauche, action droite -->
+  <div style="position:relative;z-index:2;width:100%;height:100%;display:grid;grid-template-columns:380px 1fr;overflow:hidden;">
 
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--cyan),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">TIRAGE AU SORT</div>
-    <div style="font-size:.85rem;color:var(--dim);letter-spacing:.1em;margin-bottom:30px;">TEAM BUILDING — VALEUR 1 000 €</div>
-
-    <!-- Liste des candidats -->
-    <div style="margin-bottom:28px;">
-      <div style="font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;">PARTICIPANTS AU TIRAGE (<span id="tirage-nb">0</span>)</div>
-      <div id="tirage-liste" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:48px;"></div>
-    </div>
-
-    <!-- Zone résultat -->
-    <div id="tirage-result" style="display:none;margin-bottom:28px;">
-      <div style="font-size:5rem;margin-bottom:10px;" id="tirage-emoji">🏆</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.2em;color:var(--dim);margin-bottom:6px;">GAGNANT</div>
-      <div id="tirage-winner-name" style="font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;"></div>
-      <div id="tirage-winner-co" style="font-size:1rem;color:var(--soft);margin-top:6px;"></div>
-      <div style="margin-top:16px;padding:14px 24px;background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);border-radius:14px;display:inline-block;">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em;color:var(--lime);">Team Building sur mesure LUMIIA</div>
-        <div style="font-size:.78rem;color:var(--soft);margin-top:4px;">Valeur 1 000 €</div>
+    <!-- COLONNE GAUCHE : participants -->
+    <div style="border-right:1px solid var(--bd);display:flex;flex-direction:column;padding:28px 20px;overflow:hidden;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.18em;color:var(--dim);margin-bottom:12px;flex-shrink:0;">
+        PARTICIPANTS AU TIRAGE &nbsp;<span style="color:var(--cyan);" id="tirage-nb">0</span>
       </div>
+      <div id="tirage-liste" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;align-content:start;flex:1;"></div>
     </div>
 
-    <!-- Bouton -->
-    <button id="tirage-btn" onclick="lancerTirage()" style="padding:18px 56px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.12em;cursor:pointer;box-shadow:0 0 40px rgba(77,217,232,.4);transition:all .2s;">
-      🎲 LANCER LE TIRAGE
-    </button>
-    <button id="tirage-reset" onclick="resetTirage()" style="display:none;margin-top:12px;padding:10px 28px;border:1px solid var(--bd);border-radius:50px;background:transparent;color:var(--dim);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">
-      ↺ Recommencer
-    </button>
+    <!-- COLONNE DROITE : titre + résultat + bouton -->
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;text-align:center;gap:20px;">
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2.5rem,5vw,4.5rem);letter-spacing:.15em;background:linear-gradient(90deg,var(--cyan),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">TIRAGE AU SORT</div>
+        <div style="font-size:.82rem;color:var(--dim);letter-spacing:.12em;margin-top:4px;">TEAM BUILDING SUR MESURE LUMIIA — VALEUR 1 000 €</div>
+      </div>
 
+      <!-- Zone résultat -->
+      <div id="tirage-result" style="display:none;width:100%;">
+        <div style="font-size:5rem;margin-bottom:8px;" id="tirage-emoji">🏆</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.25em;color:var(--dim);margin-bottom:8px;">GAGNANT</div>
+        <div id="tirage-winner-name" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,7vw,6rem);letter-spacing:.06em;background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;"></div>
+        <div id="tirage-winner-co" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(1.2rem,3vw,2.2rem);letter-spacing:.1em;color:var(--violet);margin-top:6px;"></div>
+        <div style="margin-top:20px;padding:18px 28px;background:rgba(184,255,60,.08);border:2px solid rgba(184,255,60,.25);border-radius:16px;display:inline-block;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.1em;color:var(--lime);">Team Building sur mesure LUMIIA</div>
+          <div style="font-size:.78rem;color:var(--soft);margin-top:2px;">Valeur 1 000 €</div>
+          <div style="font-size:.72rem;color:var(--dim);margin-top:6px;">📧 Un email de confirmation va vous être envoyé.</div>
+        </div>
+      </div>
+
+      <!-- Bouton tirage -->
+      <button id="tirage-btn" onclick="lancerTirage()" style="padding:20px 64px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:clamp(1.2rem,2.5vw,1.8rem);letter-spacing:.12em;cursor:pointer;box-shadow:0 0 50px rgba(77,217,232,.4);transition:all .2s;">🎲 LANCER LE TIRAGE</button>
+      <button id="tirage-reset" onclick="resetTirage()" style="display:none;padding:10px 28px;border:1px solid var(--bd);border-radius:50px;background:transparent;color:var(--dim);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">↺ Recommencer</button>
+    </div>
   </div>
   <!-- Particules fond -->
   <div id="tirage-bg" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
@@ -1317,7 +1321,11 @@ function initFB() {
         if (id) showRoueProj(id);
       }
     });
+    // Ignorer le spin Firebase au démarrage (valeur résiduelle)
+    let spinReady = false;
+    setTimeout(() => { spinReady = true; }, 2000);
     db.ref(`${FB_PATH}/spin`).on('value', snap => {
+      if (!spinReady) return; // ignorer au démarrage
       const d = snap.val();
       if (d && d.result !== undefined) animateSpin(d.result, d.joueurKey);
     });
@@ -1701,8 +1709,9 @@ function playerSpinDone(target) {
   launchConfetti();
   const lot = LOTS[target];
   if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'gagne', lot });
-  // Popup overlay (même que projection)
-  showOverlay(myKey ? (joueurs[myKey]?.nom || '') : '', lot, LOT_EMOJIS[target]);
+  // Popup overlay
+  const pNom = myKey && joueurs[myKey] ? joueurs[myKey].nom : '';
+  showOverlay(pNom, lot, LOT_EMOJIS[target]);
   // Écran attente derrière le popup
   const msgEl  = document.getElementById('attente-msg');
   const subEl  = document.getElementById('attente-sub');
@@ -1802,10 +1811,27 @@ function showOverlay(nom, lot, emoji) {
   document.getElementById('ov-r-emoji').textContent = emoji;
   document.getElementById('ov-r-joueur').textContent = nom;
   document.getElementById('ov-r-lot').textContent = lot;
+  // Message selon le lot
+  const isTirage = lot && lot.toLowerCase().includes('tirage au sort');
+  const msgEl = document.querySelector('#ov-card > div[style*="email"]');
+  if (msgEl) {
+    msgEl.textContent = isTirage
+      ? '🎉 Le tirage au sort aura lieu en fin de soirée en présence de l’équipe du REDA.'
+      : '📧 Vous recevrez votre lot par email.';
+  }
   document.getElementById('ov-result').classList.add('show');
 }
 function closeOverlay() {
   document.getElementById('ov-result').classList.remove('show');
+  if (isPlayerMode) {
+    // Proposer fermer la fenêtre
+    const attSub = document.getElementById('attente-sub');
+    if (attSub) {
+      attSub.style.display = 'block';
+      attSub.innerHTML = 'Merci d’avoir joué ! 🎊<br><button onclick="window.close();history.back();" style="margin-top:10px;padding:10px 24px;border:1px solid rgba(255,255,255,.2);border-radius:50px;background:rgba(255,255,255,.08);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">✕ Fermer le jeu</button>';
+    }
+    return;
+  }
   document.getElementById('wait-msg').style.display = '';
   document.getElementById('roue-zone').style.display = 'none';
 }
@@ -2118,8 +2144,9 @@ function renderTirageListe() {
     return;
   }
   el.innerHTML = candidates.map(([k,j]) => `
-    <div style="padding:8px 16px;background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);border-radius:50px;font-size:.85rem;font-weight:700;color:var(--tx);">
-      🏆 ${esc(j.nom)} <span style="font-size:.68rem;color:var(--dim);">${esc(j.co||'')}</span>
+    <div style="padding:12px 14px;background:rgba(184,255,60,.07);border:1px solid rgba(184,255,60,.2);border-radius:14px;text-align:center;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.06em;color:var(--tx);line-height:1.1;">${esc(j.nom)}</div>
+      <div style="font-size:.68rem;color:var(--dim);margin-top:3px;">${esc(j.co||'')}</div>
     </div>`).join('');
 }
 
@@ -2146,8 +2173,9 @@ function lancerTirage() {
 
   function flash() {
     const c = candidates[i % candidates.length];
-    liste.innerHTML = `<div style="padding:14px 32px;background:linear-gradient(135deg,rgba(77,217,232,.15),rgba(168,85,247,.15));border:2px solid var(--cyan);border-radius:50px;font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:var(--tx);animation:pop .1s both;">
-      🏆 ${esc(c[1].nom)}
+    liste.innerHTML = `<div style="grid-column:1/-1;padding:18px 32px;background:linear-gradient(135deg,rgba(77,217,232,.15),rgba(168,85,247,.15));border:2px solid var(--cyan);border-radius:16px;text-align:center;animation:pop .1s both;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:.08em;color:var(--tx);">${esc(c[1].nom)}</div>
+      <div style="font-size:.85rem;color:var(--dim);margin-top:4px;">${esc(c[1].co||'')}</div>
     </div>`;
     i++;
     rounds++;
