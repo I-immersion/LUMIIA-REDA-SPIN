@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<!-- ASSEMBL — LUMIIA REDA SPIN — v1.0 -->
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ASSEMBL · LUMIIA</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+/* ════════════ RESET & VARS ════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --cosmos:#0b0520; --deep:#05001a; --panel:#140932;
+  --cyan:#4dd9e8; --magenta:#d946ef; --violet:#a855f7; --lime:#b8ff3c;
+  --or:#ffd700; --danger:#ff4444; --success:#4ade80;
+  --texte:#f0e8f8; --soft:#c9c2e8; --dim:rgba(201,194,232,.45);
+  --border:rgba(255,255,255,.1);
+}
+html,body{height:100%;background:var(--deep);color:var(--texte);font-family:'Nunito',sans-serif;overflow:hidden;}
+
+/* ════════════ TOPBAR ════════════ */
+#topbar{
+  height:50px;display:flex;align-items:center;gap:0;
+  background:rgba(5,0,26,.95);border-bottom:1px solid var(--border);
+  position:fixed;top:0;left:0;right:0;z-index:200;
+}
+.tb-logo{
+  padding:0 16px;font-family:'Bebas Neue',sans-serif;font-size:.95rem;
+  letter-spacing:.3em;border-right:1px solid var(--border);
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.tb-tabs{display:flex;height:100%;}
+.tb-tab{
+  padding:0 20px;border:none;background:transparent;color:var(--dim);
+  font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:.12em;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+}
+.tb-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.tb-spacer{flex:1;}
+.tb-right{display:flex;align-items:center;gap:8px;padding:0 14px;}
+.tb-btn{
+  padding:5px 12px;border:1px solid var(--border);border-radius:7px;
+  background:transparent;color:var(--dim);font-size:.7rem;cursor:pointer;transition:all .2s;
+}
+.tb-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.tb-btn.lime{border-color:rgba(184,255,60,.3);color:var(--lime);}
+.tb-btn.lime:hover{border-color:var(--lime);}
+.tb-btn.danger{border-color:rgba(255,68,68,.3);color:rgba(255,68,68,.6);}
+.tb-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ════════════ VUES ════════════ */
+.view{display:none;position:fixed;top:50px;left:0;right:0;bottom:0;}
+.view.active{display:flex;}
+
+/* ════════════ VUE PROJECTION ════════════ */
+#view-proj{background:var(--deep);}
+#proj-layout{
+  width:100%;height:100%;
+  display:grid;grid-template-columns:260px 1fr 280px;
+  overflow:hidden;
+}
+
+/* Gauche — joueurs */
+#col-left{
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.col-hd{
+  padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.col-hd-lbl{font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:.12em;color:var(--dim);}
+.col-hd-val{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--cyan);}
+
+#joueurs-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
+.j-card{
+  padding:10px 12px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;transition:all .3s;
+}
+.j-card.actif{
+  box-shadow:0 0 20px rgba(184,255,60,.3);
+  animation:pulse-card 1s ease-in-out infinite;
+}
+@keyframes pulse-card{0%,100%{border-color:rgba(184,255,60,.4)}50%{border-color:var(--lime)}}
+.j-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.j-name{flex:1;font-weight:800;font-size:.88rem;}
+.j-score{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--lime);}
+.j-turn-badge{
+  font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 7px;border-radius:50px;background:rgba(184,255,60,.15);
+  color:var(--lime);display:none;
+}
+.j-card.actif .j-turn-badge{display:inline;}
+
+/* Centre — grille */
+#col-centre{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;gap:16px;position:relative;overflow:hidden;
+}
+.centre-bg{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 70% at 50% 50%,rgba(168,85,247,.06) 0%,transparent 70%);
+}
+
+/* Chrono arc */
+#chrono-wrap{
+  position:relative;width:80px;height:80px;flex-shrink:0;
+}
+#chrono-wrap svg{position:absolute;inset:0;transform:rotate(-90deg);}
+.chr-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:5;}
+.chr-arc{
+  fill:none;stroke:var(--lime);stroke-width:5;stroke-linecap:round;
+  stroke-dasharray:220;stroke-dashoffset:0;transition:stroke-dashoffset .9s linear,stroke .3s;
+}
+.chr-arc.urgent{stroke:var(--danger);}
+#chrono-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.8rem;
+}
+#chrono-num.urgent{color:var(--danger);}
+
+/* Grille puzzle */
+#proj-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:6px;flex-shrink:0;
+}
+.cell{
+  position:relative;border-radius:10px;overflow:hidden;
+  cursor:default;transition:transform .2s;
+  border:2px solid rgba(255,255,255,.08);
+}
+.cell-front,.cell-back{
+  width:100%;height:100%;
+  position:absolute;top:0;left:0;
+  backface-visibility:hidden;transition:transform .5s cubic-bezier(.4,2,.6,1);
+}
+.cell-front{transform:rotateY(180deg);}
+.cell-back{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--panel);
+}
+.cell-back-icon{font-size:1.6rem;opacity:.3;}
+.cell.revealed .cell-front{transform:rotateY(0deg);}
+.cell.revealed .cell-back{transform:rotateY(-180deg);}
+.cell.placed{border-color:rgba(184,255,60,.5)!important;box-shadow:0 0 16px rgba(184,255,60,.2);}
+.cell.locked{
+  opacity:.4;
+  border-color:rgba(255,68,68,.3)!important;
+}
+.cell.locked .cell-back{background:rgba(255,68,68,.08);}
+.cell.locked .cell-back-icon::after{content:'🔒';font-size:1.2rem;}
+.cell.locked .cell-back-icon{display:none;}
+.cell-placed-check{
+  position:absolute;bottom:4px;right:4px;
+  font-size:.8rem;z-index:10;opacity:0;transition:opacity .3s;
+}
+.cell.placed .cell-placed-check{opacity:1;}
+/* Image puzzle — SVG généré en JS */
+.cell-img{width:100%;height:100%;display:block;}
+
+/* Infos bas */
+#proj-info{
+  text-align:center;padding:0 20px;
+}
+#tour-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+#joueur-actif-label{
+  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;
+}
+#score-global{font-size:.8rem;color:var(--soft);margin-top:4px;}
+
+/* Droite — état + historique */
+#col-right{
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;padding:16px;gap:14px;overflow-y:auto;
+}
+.result-card{
+  border-radius:14px;padding:18px;text-align:center;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+}
+.result-emoji{font-size:2.2rem;margin-bottom:8px;display:block;}
+.result-titre{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;margin-bottom:6px;}
+.result-desc{font-size:.78rem;color:var(--soft);line-height:1.55;}
+.section-lbl{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.section-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+.hist-list{display:flex;flex-direction:column;gap:4px;}
+.hist-item{
+  padding:6px 10px;border-radius:7px;font-size:.72rem;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.hist-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.hist-txt{flex:1;color:var(--soft);}
+.hist-ico{font-size:.9rem;}
+
+/* Barre progression */
+.prog-bar{
+  height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;
+}
+.prog-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--violet),var(--lime));
+  transition:width .4s cubic-bezier(.4,0,.2,1);
+}
+
+/* Stats mini */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.stat-box{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:10px;text-align:center;
+}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--cyan);}
+.stat-l{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-top:2px;}
+
+/* ════════════ VUE JOUEURS (portrait) ════════════ */
+#view-player{
+  background:#0d0d1a;align-items:center;justify-content:center;gap:32px;
+}
+.phone-wrap{
+  width:360px;height:calc(100% - 20px);max-height:780px;
+  background:var(--cosmos);border-radius:32px;
+  border:2px solid rgba(255,255,255,.1);overflow:hidden;
+  box-shadow:0 0 50px rgba(0,0,0,.8),0 0 100px rgba(77,217,232,.04);
+  display:flex;flex-direction:column;position:relative;
+}
+.phone-notch{
+  width:110px;height:24px;background:var(--cosmos);
+  border:2px solid rgba(255,255,255,.08);border-top:none;
+  border-radius:0 0 14px 14px;
+  position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10;
+}
+.phone-inner{
+  flex:1;overflow-y:auto;padding:36px 16px 24px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.phone-inner::-webkit-scrollbar{display:none;}
+.phone-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.3em;
+  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.phone-status{
+  width:100%;padding:12px 14px;border-radius:12px;text-align:center;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+}
+.phone-status-lbl{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.phone-status-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;}
+.phone-status-val.actif{color:var(--lime);}
+.phone-status-val.attente{color:var(--dim);}
+.phone-status-val.locked-info{color:var(--danger);}
+
+/* Grille joueur */
+#player-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:5px;width:100%;
+}
+.p-cell{
+  aspect-ratio:1;border-radius:9px;overflow:hidden;
+  border:2px solid rgba(255,255,255,.08);
+  cursor:pointer;transition:all .2s;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--panel);
+}
+.p-cell.locked{opacity:.4;cursor:not-allowed;border-color:rgba(255,68,68,.25);background:rgba(255,40,40,.05);}
+.p-cell.placed{border-color:rgba(184,255,60,.4);cursor:default;background:rgba(184,255,60,.05);}
+.p-cell.playable{border-color:rgba(77,217,232,.4);box-shadow:0 0 12px rgba(77,217,232,.15);}
+.p-cell.playable:active{transform:scale(.93);}
+.p-cell-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.p-cell-ico{font-size:1.4rem;opacity:.25;}
+.p-cell-ico-lock{font-size:1.1rem;}
+.p-cell-num{
+  position:absolute;top:3px;left:5px;
+  font-family:'Bebas Neue',sans-serif;font-size:.7rem;color:rgba(255,255,255,.3);
+}
+
+.phone-turn-msg{
+  width:100%;padding:14px;border-radius:12px;text-align:center;
+  font-size:.82rem;color:var(--soft);line-height:1.5;
+}
+.phone-turn-msg.c-actif{
+  background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);color:var(--lime);
+  font-weight:700;
+}
+.phone-turn-msg.c-attente{background:rgba(255,255,255,.04);border:1px solid var(--border);}
+.phone-turn-msg.c-locked{background:rgba(255,68,68,.06);border:1px solid rgba(255,68,68,.2);color:#ff8888;}
+
+/* Phone side info */
+.phone-side-note{
+  max-width:180px;text-align:center;
+  font-size:.76rem;color:var(--dim);line-height:1.6;
+}
+
+/* ════════════ OVERLAY FIN + SETUP ════════════ */
+#overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(5,0,26,.97);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px;
+}
+#overlay.show{display:flex;}
+#ov-emoji{font-size:clamp(3rem,8vw,6rem);margin-bottom:16px;animation:big-pop .6s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes big-pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+#ov-titre{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,6vw,5rem);
+  letter-spacing:.06em;line-height:1.1;margin-bottom:12px;
+  background:linear-gradient(135deg,var(--lime),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+#ov-sous{font-size:clamp(.9rem,2vw,1.3rem);color:var(--soft);max-width:600px;line-height:1.6;margin-bottom:32px;}
+.ov-stats{display:flex;gap:28px;justify-content:center;margin-bottom:36px;}
+.ov-stat{text-align:center;}
+.ov-stat-n{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;color:var(--or);}
+.ov-stat-l{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);}
+.ov-btn{
+  padding:14px 40px;border:none;border-radius:50px;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  color:var(--deep);font-family:'Bebas Neue',sans-serif;
+  font-size:1rem;letter-spacing:.1em;cursor:pointer;margin:6px;
+  box-shadow:0 0 28px rgba(77,217,232,.3);transition:all .2s;
+}
+.ov-btn:hover{opacity:.85;}
+.ov-btn.ghost{background:transparent;border:1px solid var(--border);color:var(--dim);box-shadow:none;}
+
+/* Setup joueurs */
+#setup-panel{
+  max-width:480px;width:100%;
+}
+.setup-title{
+  font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.1em;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:6px;
+}
+.setup-sub{font-size:.82rem;color:var(--dim);margin-bottom:28px;}
+.setup-joueurs{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+.setup-j{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border-radius:12px;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  transition:border-color .2s;
+}
+.setup-j.filled{border-color:rgba(77,217,232,.3);}
+.setup-j-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.setup-j-input{
+  flex:1;background:transparent;border:none;outline:none;
+  color:var(--texte);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
+}
+.setup-j-input::placeholder{color:var(--dim);}
+.setup-note{font-size:.72rem;color:var(--dim);text-align:center;margin-bottom:20px;line-height:1.55;}
+
+/* Confettis */
+#confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:600;}
+.conf{position:absolute;width:7px;height:7px;border-radius:2px;animation:cf-fall linear both;}
+@keyframes cf-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="tb-logo">ASSEMBL</div>
+  <div class="tb-tabs">
+    <button class="tb-tab active" onclick="setView('proj')">🎬 PROJECTION</button>
+    <button class="tb-tab" onclick="setView('player')">📱 JOUEURS</button>
+  </div>
+  <div class="tb-spacer"></div>
+  <div class="tb-right">
+    <button class="tb-btn lime" onclick="showSetup()">▶ NOUVELLE PARTIE</button>
+    <button class="tb-btn danger" onclick="resetGame()">↺ Reset</button>
+  </div>
+</div>
+
+<!-- PROJECTION -->
+<div class="view active" id="view-proj">
+  <div id="proj-layout">
+
+    <!-- Gauche -->
+    <div id="col-left">
+      <div class="col-hd">
+        <span class="col-hd-lbl">👥 JOUEURS</span>
+        <span class="col-hd-val" id="nb-j">0</span>
+      </div>
+      <div id="joueurs-list">
+        <div style="padding:20px;text-align:center;font-size:.8rem;color:var(--dim);">Lance une nouvelle partie →</div>
+      </div>
+    </div>
+
+    <!-- Centre -->
+    <div id="col-centre">
+      <div class="centre-bg"></div>
+
+      <!-- Chrono -->
+      <div id="chrono-wrap">
+        <svg viewBox="0 0 80 80">
+          <circle class="chr-bg" cx="40" cy="40" r="35"/>
+          <circle class="chr-arc" id="chr-arc" cx="40" cy="40" r="35"/>
+        </svg>
+        <div id="chrono-num">—</div>
+      </div>
+
+      <!-- Grille projection -->
+      <div id="proj-grid"></div>
+
+      <!-- Infos tour -->
+      <div id="proj-info">
+        <div id="tour-label">EN ATTENTE DE PARTIE</div>
+        <div id="joueur-actif-label" style="color:var(--dim);">Lance une nouvelle partie</div>
+        <div id="score-global"></div>
+      </div>
+
+    </div>
+
+    <!-- Droite -->
+    <div id="col-right">
+
+      <div class="result-card" id="result-card">
+        <span class="result-emoji">🧩</span>
+        <div class="result-titre" style="color:var(--dim);">ASSEMBL</div>
+        <div class="result-desc">Construisez ensemble l'image LUMIIA. Chaque d\u00e9cision a des cons\u00e9quences sur les autres.</div>
+      </div>
+
+      <div>
+        <div class="section-lbl">PROGRESSION</div>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:.68rem;color:var(--dim);">
+          <span id="prog-lbl">0 / 9 pièces</span>
+          <span id="prog-tours">0 tours</span>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-n" id="s-tours">0</div><div class="stat-l">Tours jou\u00e9s</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-pieces">0</div><div class="stat-l">Pi\u00e8ces pos\u00e9es</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-locks">0</div><div class="stat-l">Blocages</div></div>
+        <div class="stat-box"><div class="stat-n" id="s-combo">0</div><div class="stat-l">Combo lib\u00e9r\u00e9s</div></div>
+      </div>
+
+      <!-- QR Code accès joueurs -->
+      <div style="text-align:center;">
+        <div class="section-lbl">📱 APP JOUEURS</div>
+        <img id="qr-img"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&bgcolor=140932&color=4dd9e8&data=https%3A%2F%2Fi-immersion.github.io%2FLUMIIA-REDA-SPIN%2Fassembl.html"
+          style="border-radius:10px;display:block;margin:0 auto 6px;"
+          width="160" height="160" alt="QR Code">
+        <div style="font-size:.62rem;color:var(--dim);line-height:1.5;">
+          i-immersion.github.io<br>
+          /LUMIIA-REDA-SPIN/assembl.html
+        </div>
+      </div>
+
+      <div>
+        <div class="section-lbl">HISTORIQUE</div>
+        <div class="hist-list" id="hist-list">
+          <div style="font-size:.72rem;color:var(--dim);text-align:center;padding:6px;">—</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- JOUEURS (preview mobile) -->
+<div class="view" id="view-player">
+  <div style="position:relative;">
+    <div class="phone-wrap">
+      <div class="phone-notch"></div>
+      <div class="phone-inner">
+
+        <div class="phone-logo">ASSEMBL</div>
+
+        <div class="phone-status" id="phone-status">
+          <div class="phone-status-lbl">Statut</div>
+          <div class="phone-status-val attente" id="phone-status-val">En attente</div>
+        </div>
+
+        <!-- Grille joueur -->
+        <div id="player-grid"></div>
+
+        <div class="phone-turn-msg c-attente" id="phone-turn-msg">
+          En attente du lancement de la partie…
+        </div>
+
+      </div>
+    </div>
+    <div style="position:absolute;bottom:-28px;left:0;right:0;text-align:center;font-size:.58rem;letter-spacing:.12em;color:rgba(255,255,255,.18);text-transform:uppercase;">Aperçu vue téléphone</div>
+  </div>
+
+  <div class="phone-side-note">
+    <strong style="color:var(--cyan);display:block;margin-bottom:8px;">App joueurs à venir</strong>
+    Chaque joueur aura cette vue sur son téléphone via QR code. Les cases jouables s'allument en bleu.
+    <br><br>
+    <span style="color:var(--lime);">Case bleue</span> = jouable<br>
+    <span style="color:rgba(255,68,68,.7);">Case rouge</span> = bloquée<br>
+    <span style="color:var(--lime);">Case verte</span> = posée ✓
+  </div>
+</div>
+
+<!-- OVERLAY (setup + fin de partie) -->
+<div id="overlay" class="show">
+  <div id="setup-panel">
+    <div class="setup-title">🧩 ASSEMBL</div>
+    <div class="setup-sub">Construisez l'image ensemble. Chaque décision a des conséquences.</div>
+    <div class="setup-joueurs" id="setup-joueurs"></div>
+    <div class="setup-note">
+      Minimum 2 joueurs · Maximum 4 · Chacun joue à son tour<br>
+      Bonne pièce → voisines libérées · Mauvaise → voisines bloquées 1 tour
+    </div>
+    <button class="ov-btn" onclick="startGame()">▶ LANCER LA PARTIE</button>
+  </div>
+</div>
+
+<!-- Confettis -->
+<div id="confetti-wrap"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   FIREBASE
+══════════════════════════════════════════ */
+const FB_CONFIG = {
+  apiKey:"AIzaSyDXkJzBPkV6Uad56WBqL0fCKgjMIPQS-YE",
+  databaseURL:"https://lumiia-live-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"lumiia-live"
+};
+let db = null;
+function initFB(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+    db = firebase.database();
+  }catch(e){ console.warn('Firebase',e); }
+}
+const FB_PATH = 'assembl';
+
+/* ══════════════════════════════════════════
+   COULEURS JOUEURS
+══════════════════════════════════════════ */
+const PLAYER_COLORS = ['#4dd9e8','#d946ef','#b8ff3c','#ffd700'];
+const PLAYER_NAMES_DEFAULT = ['Joueur 1','Joueur 2','Joueur 3','Joueur 4'];
+
+/* ══════════════════════════════════════════
+   GÉNÉRATION IMAGE LUMIIA (SVG 3×3 en base64)
+   On génère 9 "pièces" visuelles distinctes
+   qui forment un visuel cosmos cohérent.
+══════════════════════════════════════════ */
+// Génère l'IMAGE LUMIIA COMPLÈTE (450×450) — même image pour toutes les pièces
+// Chaque pièce = viewBox décalé sur le fragment correspondant
+function getFullImageSVG(){
+  // Étoiles déterministes sur toute l'image
+  let stars = '';
+  for(let i=0;i<60;i++){
+    const sx = ((i*137)%450);
+    const sy = ((i*97+31)%450);
+    const sr = .6+((i*3)%4)*.4;
+    const so = .2+((i*7)%7)/14;
+    stars += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="white" opacity="${so}"/>`;
+  }
+  return `
+    <!-- Fond cosmos -->
+    <rect width="450" height="450" fill="#05001a"/>
+    <defs>
+      <radialGradient id="bg1" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="#a855f7" stop-opacity=".18"/>
+        <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bg2" cx="20%" cy="25%" r="40%">
+        <stop offset="0%" stop-color="#4dd9e8" stop-opacity=".12"/>
+        <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="bg3" cx="80%" cy="75%" r="40%">
+        <stop offset="0%" stop-color="#d946ef" stop-opacity=".10"/>
+        <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="450" height="450" fill="url(#bg1)"/>
+    <rect width="450" height="450" fill="url(#bg2)"/>
+    <rect width="450" height="450" fill="url(#bg3)"/>
+    ${stars}
+    <!-- Orbes déco -->
+    <circle cx="90"  cy="90"  r="60" fill="#4dd9e8" opacity=".06"/>
+    <circle cx="360" cy="360" r="70" fill="#d946ef" opacity=".06"/>
+    <circle cx="225" cy="225" r="90" fill="#a855f7" opacity=".05"/>
+    <circle cx="370" cy="80"  r="45" fill="#b8ff3c" opacity=".07"/>
+    <circle cx="80"  cy="370" r="50" fill="#4dd9e8" opacity=".06"/>
+    <!-- Étoiles déco grandes -->
+    <text x="60"  y="130" font-size="22" fill="#4dd9e8" opacity=".4" font-family="serif">✦</text>
+    <text x="390" y="110" font-size="18" fill="#b8ff3c" opacity=".5" font-family="serif">✧</text>
+    <text x="40"  y="320" font-size="16" fill="#d946ef" opacity=".4" font-family="serif">◆</text>
+    <text x="400" y="350" font-size="20" fill="#4dd9e8" opacity=".4" font-family="serif">✦</text>
+    <text x="200" y="60"  font-size="14" fill="#a855f7" opacity=".5" font-family="serif">✧</text>
+    <text x="200" y="415" font-size="14" fill="#a855f7" opacity=".5" font-family="serif">✧</text>
+    <!-- Ligne déco top -->
+    <line x1="60" y1="155" x2="390" y2="155" stroke="#4dd9e8" stroke-width=".8" opacity=".2"/>
+    <line x1="60" y1="295" x2="390" y2="295" stroke="#4dd9e8" stroke-width=".8" opacity=".2"/>
+    <!-- LUMIIA — texte principal centré -->
+    <text x="225" y="230"
+      text-anchor="middle" dominant-baseline="middle"
+      font-family="Bebas Neue, Impact, sans-serif"
+      font-size="102" letter-spacing="18"
+      fill="url(#ltxt)" opacity=".95">LUMIIA</text>
+    <defs>
+      <linearGradient id="ltxt" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"   stop-color="#4dd9e8"/>
+        <stop offset="50%"  stop-color="#a855f7"/>
+        <stop offset="100%" stop-color="#d946ef"/>
+      </linearGradient>
+    </defs>
+    <!-- Sous-titre -->
+    <text x="225" y="275"
+      text-anchor="middle" dominant-baseline="middle"
+      font-family="Bebas Neue, Impact, sans-serif"
+      font-size="22" letter-spacing="14"
+      fill="#b8ff3c" opacity=".7">EXPERIENCES</text>
+    <!-- Ligne déco sous le titre -->
+    <rect x="140" y="290" width="170" height="2" rx="1" fill="#b8ff3c" opacity=".3"/>
+  `;
+}
+
+function generatePuzzleSVG(pieceIndex, cellSize){
+  // Chaque pièce = fenêtre sur l'image complète via viewBox
+  const col = pieceIndex % 3;
+  const row = Math.floor(pieceIndex / 3);
+  const ox = col * cellSize;   // offset X dans l'image complète
+  const oy = row * cellSize;   // offset Y dans l'image complète
+  // On scale l'image complète (450px) proportionnellement à cellSize
+  const scale = cellSize / 150; // 150px = taille référence d'une pièce
+  const fullSize = 450 * scale;
+  const vbX = ox;
+  const vbY = oy;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg"
+    width="${cellSize}" height="${cellSize}"
+    viewBox="${vbX} ${vbY} ${cellSize} ${cellSize}">
+    <g transform="scale(${scale})">${getFullImageSVG()}</g>
+  </svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ══════════════════════════════════════════
+   ÉTAT DU JEU
+══════════════════════════════════════════ */
+const GRID_SIZE = 9;
+const TURN_DURATION = 12; // secondes
+
+let gs = {
+  phase: 'idle', // idle | playing | end
+  joueurs: [],       // [{nom, color}]
+  tourIdx: 0,        // index joueur actif
+  tourNum: 0,        // numéro de tour global
+  cells: [],         // [{pieceIdx, state}] state: hidden|revealed|placed|locked
+  lockedThisTurn: [],// indices locked pour ce tour
+  stats: { tours:0, pieces:0, locks:0, combos:0 },
+  hist: [],
+};
+
+let chronoInt = null;
+let chronoSec = 0;
+const CIRC = 2 * Math.PI * 35; // ~220
+
+/* ══════════════════════════════════════════
+   VUES
+══════════════════════════════════════════ */
+function setView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tb-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.tb-tab')[v==='proj'?0:1].classList.add('active');
+  if(v==='player') renderPlayerGrid();
+}
+
+/* ══════════════════════════════════════════
+   SETUP
+══════════════════════════════════════════ */
+function showSetup(){
+  const panel = document.getElementById('setup-panel');
+  panel.innerHTML = `
+    <div class="setup-title">🧩 ASSEMBL</div>
+    <div class="setup-sub">Construisez l\u2019image ensemble. Chaque d\u00e9cision a des cons\u00e9quences.</div>
+    <div class="setup-joueurs" id="setup-joueurs"></div>
+    <div class="setup-note">
+      Minimum 2 joueurs · Maximum 4 · Chacun joue \u00e0 son tour<br>
+      Bonne pi\u00e8ce → voisines diagonales lib\u00e9r\u00e9es · Mauvaise → voisines directes bloqu\u00e9es 1 tour
+    </div>
+    <button class="ov-btn" onclick="startGame()">\u25b6 LANCER LA PARTIE</button>
+    <button class="ov-btn ghost" onclick="closeOverlay()">Annuler</button>
+  `;
+  const sj = document.getElementById('setup-joueurs');
+  sj.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const d = document.createElement('div');
+    d.className = 'setup-j' + (i<2?' filled':'');
+    d.innerHTML = `
+      <div class="setup-j-dot" style="background:${PLAYER_COLORS[i]}"></div>
+      <input class="setup-j-input" id="sj-${i}" placeholder="${i<2?'Pr\u00e9nom ou pseudo':'(optionnel)'}" value="${i<2?'Joueur '+(i+1):''}">
+    `;
+    sj.appendChild(d);
+  }
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeOverlay(){
+  if(gs.phase !== 'idle') document.getElementById('overlay').classList.remove('show');
+}
+
+function startGame(){
+  const joueurs = [];
+  for(let i=0;i<4;i++){
+    const v = document.getElementById('sj-'+i)?.value?.trim();
+    if(v) joueurs.push({nom:v, color:PLAYER_COLORS[i]});
+  }
+  if(joueurs.length < 2){ alert('Minimum 2 joueurs !'); return; }
+
+  // Mélanger les 9 pièces
+  const pieces = shuffle([0,1,2,3,4,5,6,7,8]);
+  gs = {
+    phase:'playing',
+    joueurs,
+    tourIdx: 0,
+    tourNum: 1,
+    cells: pieces.map(p => ({pieceIdx:p, state:'hidden'})),
+    lockedThisTurn: [],
+    stats: {tours:0, pieces:0, locks:0, combos:0},
+    hist: [],
+  };
+
+  document.getElementById('overlay').classList.remove('show');
+  renderAll();
+  startChrono();
+  saveToFB();
+}
+
+/* ══════════════════════════════════════════
+   LOGIQUE JEU
+══════════════════════════════════════════ */
+// Voisins directs (haut/bas/gauche/droite) — bloquage
+function directNeighbors(idx){
+  const r = Math.floor(idx/3), c = idx%3;
+  return [
+    r>0 ? idx-3 : -1,
+    r<2 ? idx+3 : -1,
+    c>0 ? idx-1 : -1,
+    c<2 ? idx+1 : -1,
+  ].filter(n=>n>=0);
+}
+// Voisins diagonaux (libération)
+function diagNeighbors(idx){
+  const r = Math.floor(idx/3), c = idx%3;
+  return [
+    r>0&&c>0 ? idx-4 : -1,
+    r>0&&c<2 ? idx-2 : -1,
+    r<2&&c>0 ? idx+2 : -1,
+    r<2&&c<2 ? idx+4 : -1,
+  ].filter(n=>n>=0);
+}
+
+function playCell(cellIdx){
+  if(gs.phase !== 'playing') return;
+  const cell = gs.cells[cellIdx];
+  if(cell.state === 'placed' || cell.state === 'locked') return;
+
+  clearChrono();
+  gs.stats.tours++;
+
+  // Est-ce la bonne place ? (pieceIdx === cellIdx signifie bonne position)
+  const correct = (cell.pieceIdx === cellIdx);
+
+  if(correct){
+    cell.state = 'placed';
+    gs.stats.pieces++;
+
+    // Libérer voisins diagonaux verrouillés
+    const freed = diagNeighbors(cellIdx).filter(n => gs.cells[n].state === 'locked');
+    freed.forEach(n => { gs.cells[n].state = 'hidden'; });
+    if(freed.length > 0) gs.stats.combos++;
+
+    gs.hist.unshift({
+      ico:'✅',
+      txt:`${gs.joueurs[gs.tourIdx].nom} — case ${cellIdx+1} \u2713${freed.length?` (+${freed.length} lib\u00e9r\u00e9es)`:''}`,
+      color: gs.joueurs[gs.tourIdx].color
+    });
+  } else {
+    cell.state = 'revealed'; // montrer brièvement
+    gs.stats.locks++;
+
+    // Bloquer voisins directs pour ce tour suivant
+    const toLock = directNeighbors(cellIdx).filter(n => gs.cells[n].state === 'hidden');
+    toLock.forEach(n => { gs.cells[n].state = 'locked'; });
+    gs.lockedThisTurn = toLock;
+
+    gs.hist.unshift({
+      ico:'❌',
+      txt:`${gs.joueurs[gs.tourIdx].nom} — case ${cellIdx+1} (${toLock.length} bloqu\u00e9es)`,
+      color: gs.joueurs[gs.tourIdx].color
+    });
+
+    // Re-cacher après 1.2s
+    setTimeout(()=>{
+      if(gs.cells[cellIdx].state === 'revealed') gs.cells[cellIdx].state = 'hidden';
+      renderAll();
+    }, 1200);
+  }
+
+  // Vérifier fin de partie
+  const placed = gs.cells.filter(c=>c.state==='placed').length;
+  if(placed === GRID_SIZE){
+    setTimeout(()=>endGame(), 800);
+    return;
+  }
+
+  // Passer au joueur suivant
+  nextTurn();
+  renderAll();
+  saveToFB();
+}
+
+function nextTurn(){
+  gs.tourIdx = (gs.tourIdx + 1) % gs.joueurs.length;
+  gs.tourNum++;
+
+  // Libérer les locked du tour précédent (si c'était pas la bonne place ils restent 1 seul tour)
+  gs.lockedThisTurn.forEach(n => {
+    if(gs.cells[n].state === 'locked') gs.cells[n].state = 'hidden';
+  });
+  gs.lockedThisTurn = [];
+
+  startChrono();
+}
+
+function endGame(){
+  clearChrono();
+  gs.phase = 'end';
+  renderAll();
+  launchConfetti();
+
+  const panel = document.getElementById('setup-panel');
+  panel.innerHTML = `
+    <span id="ov-emoji">\uD83C\uDF89</span>
+    <div id="ov-titre">IMAGE ASSEMBL\u00c9E !</div>
+    <div id="ov-sous">Bravo l'\u00e9quipe \u2014 vous avez reconstruit l\u2019image LUMIIA en ${gs.stats.tours} tours !</div>
+    <div class="ov-stats">
+      <div class="ov-stat"><div class="ov-stat-n">${gs.stats.tours}</div><div class="ov-stat-l">Tours</div></div>
+      <div class="ov-stat"><div class="ov-stat-n">${gs.stats.combos}</div><div class="ov-stat-l">Combos</div></div>
+      <div class="ov-stat"><div class="ov-stat-n">${gs.stats.locks}</div><div class="ov-stat-l">Blocages</div></div>
+    </div>
+    <div style="font-size:.82rem;color:var(--soft);margin-bottom:24px;font-style:italic;">
+      "\u00c0 ${gs.joueurs.length} d\u00e9cideurs ind\u00e9pendants, une seule image.\u00a0C'est exactement ce que LUMIIA construit pour votre \u00e9quipe."
+    </div>
+    <button class="ov-btn" onclick="showSetup()">\uD83D\uDD01 Nouvelle partie</button>
+  `;
+  document.getElementById('overlay').classList.add('show');
+}
+
+/* ══════════════════════════════════════════
+   CHRONO
+══════════════════════════════════════════ */
+function startChrono(){
+  clearChrono();
+  chronoSec = TURN_DURATION;
+  updChrono();
+  chronoInt = setInterval(()=>{
+    chronoSec--;
+    updChrono();
+    if(chronoSec <= 0){
+      clearChrono();
+      // Timeout = passe son tour automatiquement
+      gs.hist.unshift({ico:'⏱',txt:`${gs.joueurs[gs.tourIdx].nom} — temps \u00e9coul\u00e9`,color:gs.joueurs[gs.tourIdx].color});
+      nextTurn();
+      renderAll();
+      saveToFB();
+    }
+  }, 1000);
+}
+function clearChrono(){ clearInterval(chronoInt); }
+function updChrono(){
+  const el = document.getElementById('chrono-num');
+  const arc = document.getElementById('chr-arc');
+  if(!el||!arc) return;
+  el.textContent = chronoSec;
+  const offset = CIRC * (1 - chronoSec/TURN_DURATION);
+  arc.style.strokeDashoffset = offset;
+  const urgent = chronoSec <= 4;
+  el.className = urgent ? 'urgent' : '';
+  arc.className = 'chr-arc' + (urgent ? ' urgent' : '');
+}
+
+/* ══════════════════════════════════════════
+   RENDU
+══════════════════════════════════════════ */
+const CELL_SIZE_PROJ = 150; // px par case projection
+const CELL_SIZE_PLAYER = 90;
+
+function renderAll(){
+  renderProjGrid();
+  renderProjInfo();
+  renderJoueursList();
+  renderStats();
+  renderHistory();
+  renderPlayerGrid();
+  renderPhoneStatus();
+}
+
+function renderProjGrid(){
+  const grid = document.getElementById('proj-grid');
+  if(!grid) return;
+  const sz = CELL_SIZE_PROJ;
+  grid.style.width = (sz*3 + 12) + 'px';
+  grid.innerHTML = '';
+  gs.cells.forEach((cell, idx) => {
+    const div = document.createElement('div');
+    div.className = 'cell';
+    div.style.width = sz+'px'; div.style.height = sz+'px';
+    if(cell.state==='placed') div.classList.add('placed');
+    if(cell.state==='locked') div.classList.add('locked');
+    if(cell.state==='revealed'||cell.state==='placed'){
+      div.classList.add('revealed');
+    }
+
+    const front = document.createElement('div');
+    front.className = 'cell-front';
+    const img = document.createElement('img');
+    img.className = 'cell-img';
+    img.src = generatePuzzleSVG(cell.pieceIdx, sz);
+    front.appendChild(img);
+
+    const back = document.createElement('div');
+    back.className = 'cell-back';
+    back.innerHTML = cell.state==='locked'
+      ? '<div class="cell-back-icon"></div>'
+      : `<div class="cell-back-icon" style="font-size:${sz*.18}px">✦</div>`;
+
+    const check = document.createElement('div');
+    check.className = 'cell-placed-check';
+    check.textContent = '✓';
+
+    div.appendChild(back); div.appendChild(front); div.appendChild(check);
+    grid.appendChild(div);
+  });
+}
+
+function renderPlayerGrid(){
+  const grid = document.getElementById('player-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const isPlaying = gs.phase === 'playing';
+  const actifIdx = gs.tourIdx;
+
+  gs.cells.forEach((cell, idx) => {
+    const playable = isPlaying && cell.state === 'hidden';
+    const div = document.createElement('div');
+    div.className = 'p-cell';
+    div.style.aspectRatio = '1';
+    if(cell.state==='locked') div.classList.add('locked');
+    else if(cell.state==='placed') div.classList.add('placed');
+    else if(playable) div.classList.add('playable');
+
+    if(cell.state==='placed'){
+      const sz = CELL_SIZE_PLAYER;
+      div.innerHTML = `<img style="width:100%;height:100%;display:block;" src="${generatePuzzleSVG(cell.pieceIdx,CELL_SIZE_PLAYER)}">`;
+    } else if(cell.state==='locked'){
+      div.innerHTML = `<div class="p-cell-inner"><span class="p-cell-ico-lock">🔒</span></div>`;
+    } else {
+      div.innerHTML = `<div class="p-cell-inner"><span class="p-cell-ico">✦</span></div>`;
+      div.innerHTML += `<div class="p-cell-num">${idx+1}</div>`;
+    }
+
+    if(playable){
+      div.onclick = () => playCell(idx);
+    }
+    grid.appendChild(div);
+  });
+}
+
+function renderPhoneStatus(){
+  const sv = document.getElementById('phone-status-val');
+  const msg = document.getElementById('phone-turn-msg');
+  if(!sv||!msg) return;
+  if(gs.phase==='idle'){
+    sv.textContent='En attente'; sv.className='phone-status-val attente';
+    msg.textContent='En attente du lancement de la partie\u2026';
+    msg.className='phone-turn-msg c-attente';
+  } else if(gs.phase==='playing'){
+    const j = gs.joueurs[gs.tourIdx];
+    sv.textContent='Partie en cours'; sv.className='phone-status-val actif';
+    msg.textContent=`C'est au tour de ${j.nom} — case \u00e0 choisir !`;
+    msg.style.borderColor = j.color+'66';
+    msg.className='phone-turn-msg c-actif';
+  } else {
+    sv.textContent='Termin\u00e9 !'; sv.className='phone-status-val actif';
+    msg.textContent='\uD83C\uDF89 Image assembl\u00e9e ! Bravo \u00e0 toute l\u2019\u00e9quipe.';
+    msg.className='phone-turn-msg c-actif';
+  }
+}
+
+function renderJoueursList(){
+  document.getElementById('nb-j').textContent = gs.joueurs.length;
+  const c = document.getElementById('joueurs-list');
+  if(!gs.joueurs.length){
+    c.innerHTML='<div style="padding:20px;text-align:center;font-size:.8rem;color:var(--dim);">Lance une nouvelle partie →</div>';
+    return;
+  }
+  c.innerHTML='';
+  gs.joueurs.forEach((j,i)=>{
+    const d = document.createElement('div');
+    d.className = 'j-card' + (i===gs.tourIdx&&gs.phase==='playing'?' actif':'');
+    d.innerHTML = `
+      <div class="j-dot" style="background:${j.color}"></div>
+      <div class="j-name">${esc(j.nom)}</div>
+      <span class="j-turn-badge">JOUE</span>
+    `;
+    c.appendChild(d);
+  });
+}
+
+function renderProjInfo(){
+  const lbl = document.getElementById('tour-label');
+  const jal = document.getElementById('joueur-actif-label');
+  const sg = document.getElementById('score-global');
+  if(!lbl) return;
+  if(gs.phase==='idle'){
+    lbl.textContent='EN ATTENTE';
+    jal.textContent='Lance une nouvelle partie';
+    jal.style.color='var(--dim)';
+    sg.textContent='';
+  } else if(gs.phase==='playing'){
+    const j = gs.joueurs[gs.tourIdx];
+    lbl.textContent=`TOUR ${gs.tourNum} · ${gs.joueurs.length} JOUEURS`;
+    jal.textContent=`✦ ${j.nom}`;
+    jal.style.color=j.color;
+    const placed = gs.cells.filter(c=>c.state==='placed').length;
+    sg.textContent=`${placed} / ${GRID_SIZE} pi\u00e8ces assembl\u00e9es`;
+  } else {
+    lbl.textContent='PARTIE TERMIN\u00c9E';
+    jal.textContent='\uD83C\uDF89 Image compl\u00e8te !';
+    jal.style.color='var(--lime)';
+    sg.textContent=`Assembl\u00e9e en ${gs.stats.tours} tours`;
+  }
+}
+
+function renderStats(){
+  const placed = gs.cells.filter(c=>c.state==='placed').length;
+  const pct = placed/GRID_SIZE*100;
+  const pf = document.getElementById('prog-fill');
+  if(pf) pf.style.width = pct+'%';
+  setText('prog-lbl', placed+' / '+GRID_SIZE+' pi\u00e8ces');
+  setText('prog-tours', gs.stats.tours+' tours');
+  setText('s-tours', gs.stats.tours);
+  setText('s-pieces', gs.stats.pieces);
+  setText('s-locks', gs.stats.locks);
+  setText('s-combo', gs.stats.combos);
+}
+
+function renderHistory(){
+  const c = document.getElementById('hist-list');
+  if(!c) return;
+  if(!gs.hist.length){ c.innerHTML='<div style="font-size:.72rem;color:var(--dim);text-align:center;padding:6px;">—</div>'; return; }
+  c.innerHTML = gs.hist.slice(0,8).map(h=>`
+    <div class="hist-item">
+      <div class="hist-dot" style="background:${h.color||'var(--dim)'}"></div>
+      <div class="hist-txt">${esc(h.txt)}</div>
+      <div class="hist-ico">${h.ico}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════════
+   FIREBASE SYNC
+══════════════════════════════════════════ */
+function saveToFB(){
+  if(!db) return;
+  db.ref(FB_PATH+'/state').set({
+    phase:gs.phase, tourIdx:gs.tourIdx, tourNum:gs.tourNum,
+    cells:gs.cells, stats:gs.stats,
+    joueurs:gs.joueurs.map(j=>({nom:j.nom,color:j.color})),
+    timestamp:Date.now()
+  }).catch(e=>console.warn('FB save',e));
+}
+
+/* ══════════════════════════════════════════
+   RESET
+══════════════════════════════════════════ */
+function resetGame(){
+  if(!confirm('Remettre \u00e0 z\u00e9ro ?')) return;
+  clearChrono();
+  gs = {phase:'idle',joueurs:[],tourIdx:0,tourNum:0,cells:[],lockedThisTurn:[],stats:{tours:0,pieces:0,locks:0,combos:0},hist:[]};
+  document.getElementById('overlay').classList.add('show');
+  // Reset panel to setup
+  const panel = document.getElementById('setup-panel');
+  panel.innerHTML=`<div class="setup-title">\uD83E\udde9 ASSEMBL</div><div class="setup-sub">Construisez l\u2019image ensemble.</div><div class="setup-joueurs" id="setup-joueurs"></div><div class="setup-note">Minimum 2 joueurs \u00b7 Maximum 4</div><button class="ov-btn" onclick="startGame()">\u25b6 LANCER</button>`;
+  showSetup();
+}
+
+/* ══════════════════════════════════════════
+   CONFETTIS
+══════════════════════════════════════════ */
+function launchConfetti(){
+  const wrap=document.getElementById('confetti-wrap');
+  wrap.innerHTML='';
+  const colors=['#b8ff3c','#4dd9e8','#d946ef','#ffd700','#a855f7'];
+  for(let i=0;i<70;i++){
+    const d=document.createElement('div');
+    d.className='conf';
+    d.style.cssText=`left:${Math.random()*100}%;background:${colors[i%colors.length]};
+      width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;
+      animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.6}s;
+      border-radius:${Math.random()>.5?'50%':'2px'}`;
+    wrap.appendChild(d);
+  }
+  setTimeout(()=>wrap.innerHTML='',5000);
+}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function shuffle(arr){ return arr.sort(()=>Math.random()-.5); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function setText(id,v){ const el=document.getElementById(id); if(el) el.textContent=v; }
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded',()=>{
+  initFB();
+  // Init grilles vides (esthétique)
+  gs.cells = Array.from({length:9},(_,i)=>({pieceIdx:i,state:'hidden'}));
+  renderProjGrid();
+  renderPlayerGrid();
+  showSetup();
+});
+</script>
+</body>
+</html>
