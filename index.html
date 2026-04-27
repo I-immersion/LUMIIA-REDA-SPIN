@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.12 -->
+<!-- LUMIIA REDA SPIN — v3.13 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.12</div>
+  <div class="tb-v">v3.13</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -557,8 +557,13 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       </div><!-- /roue-side -->
       <!-- Lots side -->
       <div id="lots-side">
-        <div style="font-size:3.5rem;text-align:center;filter:drop-shadow(0 0 8px rgba(168,85,247,.5));">🎡</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.14em;color:var(--cyan);padding:6px 0 6px;border-bottom:1px solid var(--bd);">LES 8 LOTS</div>
+        <!-- Encart événement -->
+        <div style="background:linear-gradient(135deg,rgba(184,255,60,.1),rgba(77,217,232,.08));border:1px solid rgba(184,255,60,.3);border-radius:14px;padding:12px 14px;text-align:center;margin-bottom:10px;flex-shrink:0;">
+          <div style="font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:3px;">RÉSEAU ENTREPRENDRE DRÔME-ARDÈCHE</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.1em;background:linear-gradient(90deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;">Fête des Lauréats 2026</div>
+          <div style="font-size:.58rem;color:var(--dim);margin-top:3px;letter-spacing:.08em;">LUMIIA · Aouste-sur-Sye</div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.14em;color:var(--dim);padding:4px 0 6px;border-bottom:1px solid var(--bd);">🎁 LES 8 LOTS</div>
         <div id="legende-lots" style="display:flex;flex-direction:column;gap:4px;"></div>
       </div><!-- /lots-side -->
     </div>
@@ -2031,21 +2036,43 @@ function saveSettings() {
 }
 
 function exportCSV() {
+  const date = new Date().toISOString().slice(0,10);
   const vals = Object.values(joueurs);
-  if (!vals.length) { alert(`Aucune donn\u00e9e`); return; }
-  const hdr = ['Pr\u00e9nom','Entreprise','Email','Statut','Lot'];
-  const rows = vals.map(j => [j.nom, j.co, j.email, j.status, j.lot || '']);
-  const csv = [hdr,...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
-  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const toRow = r => r.map(v => '"'+String(v||'').replace(/"/g,'""')+'"').join(',');
+  let lines = [];
+  lines.push(toRow(['F\u00eate des Laur\u00e9ats 2026 \u2014 LUMIIA REDA SPIN','','','','','','Export du '+date]));
+  lines.push('');
+  lines.push(toRow(['=== TOUS LES PARTICIPANTS ===']));
+  lines.push(toRow(['Nom et Pr\u00e9nom','Entreprise','Email','T\u00e9l\u00e9phone','Statut','Lot','Heure']));
+  vals.forEach(j => {
+    const h = j.ts ? new Date(j.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
+    lines.push(toRow([j.nom,j.co,j.email,j.tel||'',j.status,j.lot||'',h]));
+  });
+  lines.push('');
+  const tirageParts = vals.filter(j=>j.status==='gagne'&&j.lot&&j.lot.toLowerCase().includes('tirage au sort'));
+  lines.push(toRow(['=== PARTICIPANTS AU TIRAGE AU SORT ===']));
+  lines.push(toRow(['Nom et Pr\u00e9nom','Entreprise','Email']));
+  tirageParts.forEach(j => lines.push(toRow([j.nom,j.co,j.email])));
+  lines.push('');
+  if (tirageHistorique.length) {
+    const v = tirageHistorique[tirageHistorique.length-1];
+    lines.push(toRow(['\U0001f3c6 VAINQUEUR DU TIRAGE','','']));
+    lines.push(toRow([v.nom,v.co||'',new Date(v.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})]));
+    lines.push('');
+    if (tirageHistorique.length > 1) {
+      lines.push(toRow(['=== HISTORIQUE TIRAGES ===']));
+      tirageHistorique.forEach((e,i) => {
+        lines.push(toRow(['Tirage '+(i+1),e.nom,e.co||'',new Date(e.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})]));
+      });
+    }
+  }
+  const blob = new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `lumiia-reda-spin-${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = 'lumiia-fete-laureats-2026-'+date+'.csv';
   a.click();
 }
 
-// ══════════════════════
-// CONFETTIS
-// ══════════════════════
 function launchConfetti() {
   const wrap = document.getElementById('confetti-wrap');
   wrap.innerHTML = '';
@@ -2067,8 +2094,8 @@ function launchConfetti() {
 // ══════════════════════
 function resetAll() {
   if (!confirm(`R\u00e9initialiser toutes les donn\u00e9es\u00a0?`)) return;
-  if (db) db.ref(FB_PATH).update({ joueurs: null, actif: null, spin: null });
-  joueurs = {}; hist = []; joueurActif = null;
+  if (db) db.ref(FB_PATH).update({ joueurs: null, actif: null, spin: null, tirage_historique: null });
+  joueurs = {}; hist = []; joueurActif = null; tirageHistorique = []; renderTirageHistorique();
   renderJoueurs(); updateStats(); buildHist();
   document.getElementById('wait-msg').style.display = '';
   document.getElementById('roue-zone').style.display = 'none';
