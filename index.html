@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.6 -->
+<!-- LUMIIA REDA SPIN — v3.7 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.6</div>
+  <div class="tb-v">v3.7</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -479,6 +479,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   <div class="tb-tabs">
     <button class="tb-tab active" onclick="setView('proj')">🎬 PROJECTION</button>
     <button class="tb-tab" onclick="setView('player')">📱 JOUEURS</button>
+    <button class="tb-tab" id="tab-tirage" onclick="setView('tirage')">🎰 TIRAGE</button>
   </div>
   <div class="tb-sp"></div>
   <div class="tb-right">
@@ -704,11 +705,55 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
     <div class="sp-lots" id="sp-lots"></div>
   </div>
   <div class="sp-sec">
+    <div class="sp-sec-lbl">⚠️ Si stock = zéro (lot de remplacement)</div>
+    <input type="text" class="sp-input" id="sp-fallback" placeholder="Lot de remplacement si stock épuisé…">
+    <div style="font-size:.6rem;color:var(--dim);margin-top:4px;">Ce lot remplacera tout lot dont le stock atteint 0.</div>
+  </div>
+  <div class="sp-sec">
     <div class="sp-sec-lbl">⏱ Durée par question (secondes)</div>
     <input type="number" class="sp-input" id="sp-duree" value="15" min="5" max="60">
   </div>
   <button class="sp-save" onclick="saveSettings()">💾 Enregistrer</button>
   <button class="sp-export" onclick="exportCSV()">📥 Export CSV leads</button>
+</div>
+
+
+<!-- ══ VUE TIRAGE AU SORT ══ -->
+<div class="view" id="view-tirage" style="background:var(--deep);flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+  <div style="position:relative;z-index:2;width:100%;max-width:900px;padding:30px;text-align:center;">
+
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:.15em;background:linear-gradient(90deg,var(--cyan),var(--mag));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">TIRAGE AU SORT</div>
+    <div style="font-size:.85rem;color:var(--dim);letter-spacing:.1em;margin-bottom:30px;">TEAM BUILDING — VALEUR 1 000 €</div>
+
+    <!-- Liste des candidats -->
+    <div style="margin-bottom:28px;">
+      <div style="font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;">PARTICIPANTS AU TIRAGE (<span id="tirage-nb">0</span>)</div>
+      <div id="tirage-liste" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:48px;"></div>
+    </div>
+
+    <!-- Zone résultat -->
+    <div id="tirage-result" style="display:none;margin-bottom:28px;">
+      <div style="font-size:5rem;margin-bottom:10px;" id="tirage-emoji">🏆</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.2em;color:var(--dim);margin-bottom:6px;">GAGNANT</div>
+      <div id="tirage-winner-name" style="font-family:'Bebas Neue',sans-serif;font-size:4rem;letter-spacing:.08em;background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;"></div>
+      <div id="tirage-winner-co" style="font-size:1rem;color:var(--soft);margin-top:6px;"></div>
+      <div style="margin-top:16px;padding:14px 24px;background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);border-radius:14px;display:inline-block;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em;color:var(--lime);">Team Building sur mesure LUMIIA</div>
+        <div style="font-size:.78rem;color:var(--soft);margin-top:4px;">Valeur 1 000 €</div>
+      </div>
+    </div>
+
+    <!-- Bouton -->
+    <button id="tirage-btn" onclick="lancerTirage()" style="padding:18px 56px;border:none;border-radius:50px;background:linear-gradient(135deg,var(--cyan),var(--violet));color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.12em;cursor:pointer;box-shadow:0 0 40px rgba(77,217,232,.4);transition:all .2s;">
+      🎲 LANCER LE TIRAGE
+    </button>
+    <button id="tirage-reset" onclick="resetTirage()" style="display:none;margin-top:12px;padding:10px 28px;border:1px solid var(--bd);border-radius:50px;background:transparent;color:var(--dim);font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.08em;cursor:pointer;">
+      ↺ Recommencer
+    </button>
+
+  </div>
+  <!-- Particules fond -->
+  <div id="tirage-bg" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;"></div>
 </div>
 
 <!-- OVERLAY RÉSULTAT -->
@@ -1196,8 +1241,7 @@ const FB_PATH = 'redaspin';
 let db = null;
 
 let STOCKS = [1,1,1,1,1,1,1,1]; // stock par lot (0 = illimité)
-const LOT_FALLBACK = 'Bon pour un cocktail au choix au LUMIIA Bar';
-const LOT_FALLBACK_IDX = 3; // index du lot cocktail (fallback)
+let LOT_FALLBACK = 'Bon pour un cocktail au choix au LUMIIA Bar';
 let LOTS = [
   `Session karaok\u00e9 room 3 pers.`,
   `Session Enigmatik game 2 pers.`,
@@ -1218,6 +1262,16 @@ let isPlayerMode = false;
 let myKey = null;
 let wheelAngle = 0;
 let playerJustValidated = false;
+// Charger défauts locaux si Firebase pas encore dispo
+try {
+  const saved = JSON.parse(localStorage.getItem('llspin_defaults') || 'null');
+  if (saved) {
+    if (saved.lots) LOTS = saved.lots;
+    if (saved.stocks) STOCKS = saved.stocks;
+    if (saved.fallback) LOT_FALLBACK = saved.fallback;
+    if (saved.duree) cfg.duree = saved.duree;
+  }
+} catch(e) {}
 let isSpinning = false;
 let hist = [];
 
@@ -1316,8 +1370,10 @@ function setView(v) {
   document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.tb-tab').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + v).classList.add('active');
-  document.querySelectorAll('.tb-tab')[v === 'proj' ? 0 : 1].classList.add('active');
+  const tabIdx = {proj:0,player:1,tirage:2}[v] ?? 0;
+  document.querySelectorAll('.tb-tab')[tabIdx]?.classList.add('active');
   if (v === 'player') drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
+  if (v === 'tirage') { renderTirageListe(); }
 }
 
 function goPlayerScreen(id) {
@@ -1695,9 +1751,12 @@ function onSpinEnd(target, joueurKey) {
   const psbtn = document.getElementById('player-spin-btn');
   if (psbtn) psbtn.disabled = false;
   sfxWin();
-  const lot = LOTS[target];
-  // Stock décrémenté en backoffice uniquement
-  if (STOCKS[target] > 0) { STOCKS[target]--; if (db) db.ref(FB_PATH + '/settings/stocks').set(STOCKS); }
+  // Si stock épuisé → fallback
+  const lot = (STOCKS[target] === 0) ? LOT_FALLBACK : LOTS[target];
+  if (STOCKS[target] > 0) {
+    STOCKS[target]--;
+    if (db) db.ref(FB_PATH + '/settings/stocks').set(STOCKS);
+  }
   const j = joueurs[joueurKey];
   const nom = j ? j.nom : '?';
   // Sauvegarder
@@ -1890,6 +1949,7 @@ function buildSettingsUI() {
     `;
     c.appendChild(row);
   });
+  const sfEl = document.getElementById('sp-fallback'); if (sfEl) sfEl.value = LOT_FALLBACK;
   document.getElementById('sp-duree').value = cfg.duree;
 }
 
@@ -1897,7 +1957,9 @@ function saveSettings() {
   LOTS = Array.from({length: 8}, (_, i) => document.getElementById(`sp-lot-${i}`)?.value || LOTS[i]);
   cfg.duree = parseInt(document.getElementById('sp-duree').value) || 15;
   STOCKS = Array.from({length:8},(_,i)=>parseInt(document.getElementById('sp-stock-'+i)?.value)||0);
-if (db) db.ref(`${FB_PATH}/settings`).set({ lots: LOTS, duree: cfg.duree, stocks: STOCKS });
+  LOT_FALLBACK = document.getElementById('sp-fallback')?.value || LOT_FALLBACK;
+  if (db) db.ref(`${FB_PATH}/settings`).set({ lots: LOTS, duree: cfg.duree, stocks: STOCKS, fallback: LOT_FALLBACK });
+  try { localStorage.setItem('llspin_defaults', JSON.stringify({ lots: LOTS, stocks: STOCKS, fallback: LOT_FALLBACK, duree: cfg.duree })); } catch(e) {}
   drawWheel('proj-canvas', getWheelSize(), wheelAngle);
   drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
   renderLegende();
@@ -2034,6 +2096,122 @@ function playerQuit() {
   sfxButton();
 }
 
+
+
+// ══════════════════════
+// TIRAGE AU SORT
+// ══════════════════════
+const TIRAGE_LOT_NAME = 'Tirage au sort';
+
+function getTirageCandidates() {
+  return Object.entries(joueurs).filter(([k,j]) =>
+    j.status === 'gagne' && j.lot && j.lot.toLowerCase().includes('tirage au sort')
+  );
+}
+
+function renderTirageListe() {
+  const candidates = getTirageCandidates();
+  document.getElementById('tirage-nb').textContent = candidates.length;
+  const el = document.getElementById('tirage-liste');
+  if (!candidates.length) {
+    el.innerHTML = '<div style="color:var(--dim);font-size:.82rem;">Aucun participant au tirage pour l\'instant…</div>';
+    return;
+  }
+  el.innerHTML = candidates.map(([k,j]) => `
+    <div style="padding:8px 16px;background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);border-radius:50px;font-size:.85rem;font-weight:700;color:var(--tx);">
+      🏆 ${esc(j.nom)} <span style="font-size:.68rem;color:var(--dim);">${esc(j.co||'')}</span>
+    </div>`).join('');
+}
+
+let tirageRunning = false;
+
+function lancerTirage() {
+  const candidates = getTirageCandidates();
+  if (!candidates.length) { alert('Aucun participant au tirage !'); return; }
+  if (tirageRunning) return;
+  tirageRunning = true;
+
+  const btn = document.getElementById('tirage-btn');
+  btn.disabled = true; btn.textContent = '⏳ Tirage en cours…';
+
+  const liste = document.getElementById('tirage-liste');
+  const result = document.getElementById('tirage-result');
+  result.style.display = 'none';
+
+  // Animation : faire défiler les noms rapidement
+  let i = 0, speed = 60, rounds = 0, maxRounds = 40;
+  sfxWin();
+  launchConfetti();
+  launchTirageBg();
+
+  function flash() {
+    const c = candidates[i % candidates.length];
+    liste.innerHTML = `<div style="padding:14px 32px;background:linear-gradient(135deg,rgba(77,217,232,.15),rgba(168,85,247,.15));border:2px solid var(--cyan);border-radius:50px;font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:.08em;color:var(--tx);animation:pop .1s both;">
+      🏆 ${esc(c[1].nom)}
+    </div>`;
+    i++;
+    rounds++;
+    // Ralentir progressivement
+    if (rounds < maxRounds * 0.5) speed = 60;
+    else if (rounds < maxRounds * 0.75) speed = 120;
+    else if (rounds < maxRounds * 0.9) speed = 220;
+    else speed = 380;
+
+    if (rounds < maxRounds) {
+      setTimeout(flash, speed);
+    } else {
+      // Choisir le vrai gagnant
+      const winner = candidates[Math.floor(Math.random() * candidates.length)];
+      showTirageWinner(winner[1]);
+    }
+  }
+  setTimeout(flash, 100);
+}
+
+function showTirageWinner(j) {
+  tirageRunning = false;
+  renderTirageListe();
+  document.getElementById('tirage-result').style.display = 'block';
+  document.getElementById('tirage-winner-name').textContent = j.nom;
+  document.getElementById('tirage-winner-co').textContent = j.co || '';
+  document.getElementById('tirage-btn').style.display = 'none';
+  document.getElementById('tirage-reset').style.display = 'inline-block';
+  launchConfetti(); launchConfetti();
+  // Son victoire 2x
+  setTimeout(sfxWin, 200); setTimeout(sfxWin, 3000);
+}
+
+function resetTirage() {
+  document.getElementById('tirage-result').style.display = 'none';
+  document.getElementById('tirage-btn').disabled = false;
+  document.getElementById('tirage-btn').textContent = '🎲 LANCER LE TIRAGE';
+  document.getElementById('tirage-btn').style.display = 'inline-block';
+  document.getElementById('tirage-reset').style.display = 'none';
+  document.getElementById('tirage-bg').innerHTML = '';
+  renderTirageListe();
+}
+
+function launchTirageBg() {
+  const bg = document.getElementById('tirage-bg');
+  bg.innerHTML = '';
+  const colors = ['#b8ff3c','#4dd9e8','#d946ef','#ffd700','#a855f7'];
+  for (let i = 0; i < 120; i++) {
+    const d = document.createElement('div');
+    const sz = 4 + Math.random() * 10;
+    d.style.cssText = `position:absolute;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${sz}px;height:${sz}px;border-radius:${Math.random()>.5?'50%':'2px'};
+      background:${colors[i%colors.length]};opacity:${.1+Math.random()*.3};
+      animation:cf ${3+Math.random()*4}s linear ${Math.random()*2}s infinite alternate;`;
+    bg.appendChild(d);
+  }
+}
+
+// Mettre à jour la liste tirage quand les joueurs changent
+const _origRenderJoueurs = renderJoueurs;
+// Appeler renderTirageListe si on est sur cet onglet
+function maybeUpdateTirage() {
+  if (document.getElementById('view-tirage')?.classList.contains('active')) renderTirageListe();
+}
 
 window.addEventListener('DOMContentLoaded', init);
 window.addEventListener('DOMContentLoaded', () => setTimeout(() => {
