@@ -544,96 +544,75 @@ const PLAYER_NAMES_DEFAULT = ['Joueur 1','Joueur 2','Joueur 3','Joueur 4'];
    On génère 9 "pièces" visuelles distinctes
    qui forment un visuel cosmos cohérent.
 ══════════════════════════════════════════ */
-// Génère l'IMAGE LUMIIA COMPLÈTE (450×450) — même image pour toutes les pièces
-// Chaque pièce = viewBox décalé sur le fragment correspondant
-function getFullImageSVG(){
-  // Étoiles déterministes sur toute l'image
+// Image LUMIIA complète 450×450 — toutes les defs en premier
+function buildFullSVG(vbX, vbY, cellSize){
   let stars = '';
   for(let i=0;i<60;i++){
-    const sx = ((i*137)%450);
-    const sy = ((i*97+31)%450);
-    const sr = .6+((i*3)%4)*.4;
-    const so = .2+((i*7)%7)/14;
-    stars += `<circle cx="${sx}" cy="${sy}" r="${sr}" fill="white" opacity="${so}"/>`;
+    const sx=((i*137)%450), sy=((i*97+31)%450);
+    const sr=.6+((i*3)%4)*.4, so=.2+((i*7)%7)/14;
+    stars+=`<circle cx="${sx}" cy="${sy}" r="${sr}" fill="white" opacity="${so}"/>`;
   }
-  return `
-    <!-- Fond cosmos -->
-    <rect width="450" height="450" fill="#05001a"/>
+  return `<svg xmlns="http://www.w3.org/2000/svg"
+    width="${cellSize}" height="${cellSize}"
+    viewBox="${vbX} ${vbY} 150 150">
     <defs>
-      <radialGradient id="bg1" cx="50%" cy="50%" r="70%">
+      <radialGradient id="rbg1" cx="50%" cy="50%" r="70%">
         <stop offset="0%" stop-color="#a855f7" stop-opacity=".18"/>
         <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
       </radialGradient>
-      <radialGradient id="bg2" cx="20%" cy="25%" r="40%">
+      <radialGradient id="rbg2" cx="20%" cy="25%" r="40%">
         <stop offset="0%" stop-color="#4dd9e8" stop-opacity=".12"/>
         <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
       </radialGradient>
-      <radialGradient id="bg3" cx="80%" cy="75%" r="40%">
+      <radialGradient id="rbg3" cx="80%" cy="75%" r="40%">
         <stop offset="0%" stop-color="#d946ef" stop-opacity=".10"/>
         <stop offset="100%" stop-color="#05001a" stop-opacity="0"/>
       </radialGradient>
-    </defs>
-    <rect width="450" height="450" fill="url(#bg1)"/>
-    <rect width="450" height="450" fill="url(#bg2)"/>
-    <rect width="450" height="450" fill="url(#bg3)"/>
-    ${stars}
-    <!-- Orbes déco -->
-    <circle cx="90"  cy="90"  r="60" fill="#4dd9e8" opacity=".06"/>
-    <circle cx="360" cy="360" r="70" fill="#d946ef" opacity=".06"/>
-    <circle cx="225" cy="225" r="90" fill="#a855f7" opacity=".05"/>
-    <circle cx="370" cy="80"  r="45" fill="#b8ff3c" opacity=".07"/>
-    <circle cx="80"  cy="370" r="50" fill="#4dd9e8" opacity=".06"/>
-    <!-- Étoiles déco grandes -->
-    <text x="60"  y="130" font-size="22" fill="#4dd9e8" opacity=".4" font-family="serif">✦</text>
-    <text x="390" y="110" font-size="18" fill="#b8ff3c" opacity=".5" font-family="serif">✧</text>
-    <text x="40"  y="320" font-size="16" fill="#d946ef" opacity=".4" font-family="serif">◆</text>
-    <text x="400" y="350" font-size="20" fill="#4dd9e8" opacity=".4" font-family="serif">✦</text>
-    <text x="200" y="60"  font-size="14" fill="#a855f7" opacity=".5" font-family="serif">✧</text>
-    <text x="200" y="415" font-size="14" fill="#a855f7" opacity=".5" font-family="serif">✧</text>
-    <!-- Ligne déco top -->
-    <line x1="60" y1="155" x2="390" y2="155" stroke="#4dd9e8" stroke-width=".8" opacity=".2"/>
-    <line x1="60" y1="295" x2="390" y2="295" stroke="#4dd9e8" stroke-width=".8" opacity=".2"/>
-    <!-- LUMIIA — texte principal centré -->
-    <text x="225" y="230"
-      text-anchor="middle" dominant-baseline="middle"
-      font-family="Bebas Neue, Impact, sans-serif"
-      font-size="102" letter-spacing="18"
-      fill="url(#ltxt)" opacity=".95">LUMIIA</text>
-    <defs>
       <linearGradient id="ltxt" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%"   stop-color="#4dd9e8"/>
         <stop offset="50%"  stop-color="#a855f7"/>
         <stop offset="100%" stop-color="#d946ef"/>
       </linearGradient>
     </defs>
-    <!-- Sous-titre -->
-    <text x="225" y="275"
+    <rect width="450" height="450" fill="#05001a"/>
+    <rect width="450" height="450" fill="url(#rbg1)"/>
+    <rect width="450" height="450" fill="url(#rbg2)"/>
+    <rect width="450" height="450" fill="url(#rbg3)"/>
+    ${stars}
+    <circle cx="90"  cy="90"  r="60" fill="#4dd9e8" opacity=".07"/>
+    <circle cx="360" cy="360" r="70" fill="#d946ef" opacity=".07"/>
+    <circle cx="225" cy="225" r="90" fill="#a855f7" opacity=".05"/>
+    <circle cx="370" cy="80"  r="45" fill="#b8ff3c" opacity=".08"/>
+    <circle cx="80"  cy="370" r="50" fill="#4dd9e8" opacity=".07"/>
+    <line x1="40" y1="152" x2="410" y2="152" stroke="#4dd9e8" stroke-width="1" opacity=".18"/>
+    <line x1="40" y1="298" x2="410" y2="298" stroke="#4dd9e8" stroke-width="1" opacity=".18"/>
+    <text x="40"  y="128" font-size="20" fill="#4dd9e8" opacity=".35" font-family="serif">&#x2726;</text>
+    <text x="395" y="108" font-size="16" fill="#b8ff3c" opacity=".45" font-family="serif">&#x2727;</text>
+    <text x="30"  y="318" font-size="14" fill="#d946ef" opacity=".4"  font-family="serif">&#x25c6;</text>
+    <text x="405" y="348" font-size="18" fill="#4dd9e8" opacity=".35" font-family="serif">&#x2726;</text>
+    <text x="205" y="55"  font-size="12" fill="#a855f7" opacity=".45" font-family="serif">&#x2727;</text>
+    <text x="205" y="418" font-size="12" fill="#a855f7" opacity=".45" font-family="serif">&#x2727;</text>
+    <text x="225" y="232"
       text-anchor="middle" dominant-baseline="middle"
-      font-family="Bebas Neue, Impact, sans-serif"
-      font-size="22" letter-spacing="14"
-      fill="#b8ff3c" opacity=".7">EXPERIENCES</text>
-    <!-- Ligne déco sous le titre -->
-    <rect x="140" y="290" width="170" height="2" rx="1" fill="#b8ff3c" opacity=".3"/>
-  `;
+      font-family="Impact, sans-serif"
+      font-size="96" letter-spacing="12"
+      fill="url(#ltxt)" opacity=".92">LUMIIA</text>
+    <text x="225" y="278"
+      text-anchor="middle" dominant-baseline="middle"
+      font-family="Impact, sans-serif"
+      font-size="20" letter-spacing="12"
+      fill="#b8ff3c" opacity=".65">EXPERIENCES</text>
+    <rect x="145" y="290" width="160" height="2" rx="1" fill="#b8ff3c" opacity=".28"/>
+  </svg>`;
 }
 
 function generatePuzzleSVG(pieceIndex, cellSize){
-  // Chaque pièce = fenêtre sur l'image complète via viewBox
   const col = pieceIndex % 3;
   const row = Math.floor(pieceIndex / 3);
-  const ox = col * cellSize;   // offset X dans l'image complète
-  const oy = row * cellSize;   // offset Y dans l'image complète
-  // On scale l'image complète (450px) proportionnellement à cellSize
-  const scale = cellSize / 150; // 150px = taille référence d'une pièce
-  const fullSize = 450 * scale;
-  const vbX = ox;
-  const vbY = oy;
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg"
-    width="${cellSize}" height="${cellSize}"
-    viewBox="${vbX} ${vbY} ${cellSize} ${cellSize}">
-    <g transform="scale(${scale})">${getFullImageSVG()}</g>
-  </svg>`;
+  // Image source = 450×450, chaque pièce couvre 150×150 en coords source
+  const vbX = col * 150;
+  const vbY = row * 150;
+  const svg = buildFullSVG(vbX, vbY, cellSize);
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
 
