@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.8b -->
+<!-- LUMIIA REDA SPIN — v3.9 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.8b</div>
+  <div class="tb-v">v3.9</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -697,7 +697,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   <button class="sp-close" onclick="toggleSettings()">✕</button>
   <div class="sp-title">⚙ SETTINGS</div>
   <div class="sp-sec">
-    <div class="sp-sec-lbl">👥 Participants (<span id="sp-nb-j">0</span>)</div>
+    <div class="sp-sec-lbl">👥 Participants (<span id="sp-nb-j">0</span>) &nbsp;<span id="sp-lots-counter" style="color:var(--lime);font-size:.6rem;"></span></div>
     <div id="sp-joueurs-list" style="display:flex;flex-direction:column;gap:3px;max-height:240px;overflow-y:auto;"></div>
   </div>
   <div class="sp-sec">
@@ -1869,7 +1869,7 @@ function deleteJoueur(key) {
   else { delete joueurs[key]; renderJoueurs(); updateStats(); }
 }
 function renderJoueurs() {
-  const all = Object.entries(joueurs).filter(([k,j]) => j.status !== 'quit');
+  const all = Object.entries(joueurs).filter(([k,j]) => j.status !== 'quit' && j.status !== 'gagne');
   document.getElementById('nb-j').textContent = all.length;
   const c = document.getElementById('j-list');
   if (!all.length) {
@@ -1949,6 +1949,10 @@ function buildSettingsUI() {
   const nb = document.getElementById('sp-nb-j');
   const entries = Object.values(joueurs).filter(j=>j.status!=='quit').sort((a,b) => (b.ts||0)-(a.ts||0));
   if (nb) nb.textContent = entries.length;
+  // Compteur lots distribués
+  const gagnesCount = Object.values(joueurs).filter(j=>j.status==='gagne').length;
+  const counterEl = document.getElementById('sp-lots-counter');
+  if (counterEl) counterEl.textContent = gagnesCount + '/' + LOTS.length + ' distribués';
   const badgeColor = { inscrit:'var(--dim)', quiz:'var(--or)', valide:'var(--ok)', perdu:'#ff8888', gagne:'var(--violet)' };
   const badgeTxt = { inscrit:'Inscrit', quiz:'\u23F3 Quiz', valide:'\u2705 Valid\u00e9', perdu:'Tentative', gagne:'\uD83C\uDFC6 Gagn\u00e9' };
   if (spj) spj.innerHTML = entries.length ? entries.map(j => `
@@ -1957,7 +1961,7 @@ function buildSettingsUI() {
         <div style="font-weight:800;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(j.nom)}</div>
         <div style="font-size:.6rem;color:var(--dim);">${esc(j.co||'')}${j.email?' · '+esc(j.email):''}</div>
       </div>
-      <div style="font-size:.62rem;color:${badgeColor[j.status||'inscrit']};white-space:nowrap;">${badgeTxt[j.status||'inscrit']}</div>
+      <div style="font-size:.6rem;color:${badgeColor[j.status||'inscrit']};white-space:nowrap;flex-shrink:0;">${badgeTxt[j.status||'inscrit']}${j.status==='gagne'&&j.lot?' — '+esc(j.lot.substring(0,22))+(j.lot.length>22?'…':''):''}</div>
     </div>`).join('')
     : `<div style="font-size:.72rem;color:var(--dim);text-align:center;padding:8px;">Aucun participant</div>`;
 
@@ -2166,7 +2170,7 @@ function lancerTirage() {
   result.style.display = 'none';
 
   // Animation : faire défiler les noms rapidement
-  let i = 0, speed = 60, rounds = 0, maxRounds = 40;
+  let i = 0, speed = 60, rounds = 0, maxRounds = 80;
   sfxWin();
   launchConfetti();
   launchTirageBg();
