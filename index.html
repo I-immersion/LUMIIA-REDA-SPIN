@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.11 -->
+<!-- LUMIIA REDA SPIN — v3.12 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.11</div>
+  <div class="tb-v">v3.12</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -729,7 +729,13 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       <div style="font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.18em;color:var(--dim);margin-bottom:12px;flex-shrink:0;">
         PARTICIPANTS AU TIRAGE &nbsp;<span style="color:var(--cyan);" id="tirage-nb">0</span>
       </div>
-      <div id="tirage-liste" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;align-content:start;flex:1;"></div>
+      <div id="tirage-liste" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;"></div>
+
+      <!-- Historique des tirages -->
+      <div style="margin-top:20px;padding-top:14px;border-top:1px solid var(--bd);flex-shrink:0;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:.7rem;letter-spacing:.18em;color:var(--dim);margin-bottom:10px;">📜 HISTORIQUE DES TIRAGES</div>
+        <div id="tirage-histo-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
     </div>
 
     <!-- COLONNE DROITE : titre + résultat + bouton -->
@@ -1382,7 +1388,7 @@ function setView(v) {
   const tabIdx = {proj:0,player:1,tirage:2}[v] ?? 0;
   document.querySelectorAll('.tb-tab')[tabIdx]?.classList.add('active');
   if (v === 'player') drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
-  if (v === 'tirage') { renderTirageListe(); }
+  if (v === 'tirage') { renderTirageListe(); renderTirageHistorique(); }
 }
 
 function goPlayerScreen(id) {
@@ -2228,17 +2234,51 @@ function lancerTirage() {
   setTimeout(flash, 100);
 }
 
+let tirageHistorique = []; // liste des tirages de la soirée
+
 function showTirageWinner(j) {
   tirageRunning = false;
+
+  // Sauvegarder dans l'historique
+  const entry = { nom: j.nom, co: j.co || '', ts: Date.now() };
+  tirageHistorique.push(entry);
+  if (db) db.ref(FB_PATH + '/tirage_historique').set(tirageHistorique);
+
   renderTirageListe();
+  renderTirageHistorique();
+
   document.getElementById('tirage-result').style.display = 'block';
   document.getElementById('tirage-winner-name').textContent = j.nom;
   document.getElementById('tirage-winner-co').textContent = j.co || '';
   document.getElementById('tirage-btn').style.display = 'none';
   document.getElementById('tirage-reset').style.display = 'inline-block';
   launchConfetti(); launchConfetti();
-  // Son victoire 2x
   setTimeout(sfxWin, 200); setTimeout(sfxWin, 3000);
+}
+
+function renderTirageHistorique() {
+  const el = document.getElementById('tirage-histo-list');
+  if (!el) return;
+  if (!tirageHistorique.length) {
+    el.innerHTML = '<div style="font-size:.75rem;color:var(--dim);text-align:center;padding:10px;">Aucun tirage effectué</div>';
+    return;
+  }
+  el.innerHTML = tirageHistorique.map((e, i) => {
+    const isLast = i === tirageHistorique.length - 1;
+    const heure = new Date(e.ts).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    return `<div style="
+      padding:${isLast ? '16px' : '10px'} 14px;
+      border-radius:14px;
+      background:${isLast ? 'linear-gradient(135deg,rgba(184,255,60,.15),rgba(77,217,232,.1))' : 'rgba(255,255,255,.04)'};
+      border:${isLast ? '2px solid rgba(184,255,60,.4)' : '1px solid var(--bd)'};
+      ${isLast ? 'box-shadow:0 0 20px rgba(184,255,60,.15);' : ''}
+      transition:all .3s;
+    ">
+      ${isLast ? '<div style="font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--lime);margin-bottom:6px;">🏆 GAGNANT DU TIRAGE</div>' : ''}
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:${isLast ? '1.6rem' : '1rem'};letter-spacing:.06em;color:${isLast ? 'var(--lime)' : 'var(--tx)'};">${esc(e.nom)}</div>
+      <div style="font-size:${isLast ? '.78rem' : '.62rem'};color:var(--dim);margin-top:2px;">${esc(e.co)} <span style="opacity:.5;">${heure}</span></div>
+    </div>`;
+  }).reverse().join(''); // plus récent en haut
 }
 
 function resetTirage() {
@@ -2249,6 +2289,7 @@ function resetTirage() {
   document.getElementById('tirage-reset').style.display = 'none';
   document.getElementById('tirage-bg').innerHTML = '';
   renderTirageListe();
+  renderTirageHistorique();
 }
 
 function launchTirageBg() {
