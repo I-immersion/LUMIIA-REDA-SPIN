@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.9 -->
+<!-- LUMIIA REDA SPIN — v3.9b -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.9</div>
+  <div class="tb-v">v3.9b</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -483,6 +483,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   </div>
   <div class="tb-sp"></div>
   <div class="tb-right">
+    <div style="font-size:.65rem;color:var(--dim);padding:0 10px;border-right:1px solid var(--bd);">🎁 <span id="tb-lots-counter" style="color:var(--lime);font-weight:700;">0</span><span style="color:var(--dim);"> / 8 lots</span></div>
     <a href="https://lumiia.fr" target="_blank" style="font-size:.75rem;color:var(--cyan);text-decoration:none;font-weight:700;letter-spacing:.05em;padding:0 12px;border-right:1px solid var(--bd);">lumiia.fr ↗</a>
     <button class="tb-btn" onclick="toggleSettings()">⚙ Settings</button>
     <button class="tb-btn danger" onclick="resetAll()">↺ Reset</button>
@@ -577,7 +578,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
         <div class="stats-2">
           <div class="s-box"><div class="s-n" id="s-inscrits">0</div><div class="s-l">Inscrits</div></div>
           <div class="s-box"><div class="s-n" id="s-valides">0</div><div class="s-l">Validés</div></div>
-          <div class="s-box"><div class="s-n" id="s-gagnes">0</div><div class="s-l">Lots gagnés</div></div>
+          <div class="s-box" style="border-color:rgba(184,255,60,.2);"><div class="s-n" id="s-gagnes" style="color:var(--lime);">0</div><div class="s-l">Lots distribués</div></div>
           <div class="s-box"><div class="s-n" id="s-encours">0</div><div class="s-l">En cours</div></div>
         </div>
       </div>
@@ -1917,6 +1918,9 @@ function renderJoueurs() {
 
 function updateStats() {
   const vals = Object.values(joueurs);
+  const nbGagnes = vals.filter(j => j.status === 'gagne').length;
+  const tbC = document.getElementById('tb-lots-counter');
+  if (tbC) tbC.textContent = nbGagnes;
   document.getElementById('s-inscrits').textContent = vals.length;
   document.getElementById('s-valides').textContent = vals.filter(j => j.status === 'valide').length;
   document.getElementById('s-gagnes').textContent = vals.filter(j => j.status === 'gagne').length;
