@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.3 -->
+<!-- LUMIIA REDA SPIN — v3.4 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.3</div>
+  <div class="tb-v">v3.4</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -716,7 +716,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
     <span id="ov-r-emoji" style="font-size:clamp(3rem,8vw,6rem);display:block;margin-bottom:14px;animation:bigpop .6s cubic-bezier(.34,1.56,.64,1) both;">🎁</span>
     <div id="ov-r-joueur" style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;"></div>
     <div id="ov-r-lot" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,4rem);letter-spacing:.05em;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Cadeau</div>
-    <div style="font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:20px;">📧 Vous recevrez votre lot par email — nous vous contacterons manuellement.</div>
+    <div style="font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:20px;">📧 Vous recevrez votre lot par email.</div>
     <button id="ov-r-close" onclick="closeOverlay()" style="padding:10px 32px;border:1px solid rgba(255,255,255,.2);border-radius:50px;background:rgba(255,255,255,.08);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;cursor:pointer;">✕ FERMER <span style="font-size:.6rem;color:var(--dim);">(ou ESPACE)</span></button>
   </div>
 </div>
@@ -1721,7 +1721,7 @@ function onSpinEnd(target, joueurKey) {
     if (lb) lb.style.display = 'block';
     if (ln) ln.textContent = lot;
     const sub = document.getElementById('attente-sub');
-    if (sub) sub.textContent = '📧 Tu recevras ton lot par email dans les prochains jours. Nous te contacterons manuellement.';
+    if (sub) sub.textContent = '📧 Tu recevras ton lot par email dans les prochains jours.';
   }
   // Reset actif
   if (db) db.ref(`${FB_PATH}/actif`).remove();
@@ -2050,13 +2050,13 @@ window.addEventListener('DOMContentLoaded', () => setTimeout(() => {
     setTimeout(() => { cheatBar.style.transition = 'width 4s linear'; cheatBar.style.width = '100%'; }, 10);
     cheatTimer = setTimeout(() => {
       cheatBar.style.width = '0%';
-      // Simuler validation quiz
-      playerJustValidated = true;
+      // Validation quiz directe → écran d'attente
       if (myKey && db) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'valide' });
-      drawWheel('player-canvas', getPlayerWheelSize(), 0);
-      renderLegende();
-      goPlayerScreen('ps-roue');
-      document.getElementById('player-spin-btn').disabled = false;
+      goPlayerScreen('ps-attente');
+      const am = document.getElementById('attente-msg');
+      const as = document.getElementById('attente-sub');
+      if (am) { am.textContent = '🏆 Quiz validé !'; am.style.color = ''; }
+      if (as) { as.style.display = ''; as.textContent = 'Rends-toi au stand LUMIIA — l’animateur va te sélectionner pour lancer la roue !'; }
       sfxCorrect();
     }, 4000);
   }
