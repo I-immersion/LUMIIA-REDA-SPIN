@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v2.3 -->
+<!-- LUMIIA REDA SPIN — v2.4 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -438,14 +438,15 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 
 <!-- BANDEAU PERMANENT -->
 <div id="bandeau">
-  <div id="bandeau-left">LUMIIA REDA SPIN &nbsp;·&nbsp; Team Building sur mesure &nbsp;·&nbsp; Aouste-sur-Sye (26)</div>
-  <div id="bandeau-right"><a href="https://lumiia.fr" target="_blank">lumiia.fr</a></div>
+  <div id="bandeau-logo">LUMIIA REDA SPIN</div>
+  <div id="bandeau-centre">LUMIIA — TEAM BUILDING SUR MESURE</div>
+  <div id="bandeau-droit">Aouste-sur-Sye (26)</div>
 </div>
 
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v2.3</div>
+  <div class="tb-v">v2.4</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -459,6 +460,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   </div>
   <div class="tb-sp"></div>
   <div class="tb-right">
+    <a href="https://lumiia.fr" target="_blank" style="font-size:.75rem;color:var(--cyan);text-decoration:none;font-weight:700;letter-spacing:.05em;padding:0 12px;border-right:1px solid var(--bd);">lumiia.fr ↗</a>
     <button class="tb-btn" onclick="toggleSettings()">⚙ Settings</button>
     <button class="tb-btn danger" onclick="resetAll()">↺ Reset</button>
   </div>
@@ -527,6 +529,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
           <div class="roue-center" id="proj-center" onclick="spinProj()">SPIN</div>
         </div>
         <button id="proj-spin-btn" onclick="spinProj()">🎡 LANCER LA ROUE</button>
+        <div id="legende-lots" style="display:grid;grid-template-columns:repeat(4,1fr);gap:2px 8px;width:100%;max-width:600px;padding:4px 10px;"></div>
       </div>
     </div>
 
@@ -603,7 +606,8 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       <div class="p-inner">
         <div class="p-logo">LUMIIA REDA SPIN</div>
         <div class="p-title" id="cat-bonjour">Bonjour !</div>
-        <div class="p-sub">Choisis ta catégorie de quiz.<br>5 questions — réponds juste pour lancer la roue !</div>
+        <div class="p-sub">Choisis ta catégorie de quiz.</div>
+        <div style="width:100%;background:rgba(184,255,60,.08);border:1px solid rgba(184,255,60,.2);border-radius:12px;padding:12px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.06em;color:var(--lime);">5 QUESTIONS &gt; 5 RÉPONSES JUSTES = VOUS LANCEZ LA ROUE !</div>
         <div class="cat-grid" id="cat-grid"></div>
       </div>
     </div>
@@ -897,11 +901,11 @@ function initFB() {
     db.ref(`${FB_PATH}/actif`).on('value', snap => {
       const id = snap.val();
       // Rediriger vers roue uniquement si : c'est bien ce joueur ET il est sur l'écran attente
-      if (isPlayerMode && id === myKey) {
-        const attenteScreen = document.getElementById('ps-attente');
-        if (attenteScreen && attenteScreen.classList.contains('active')) goToRouePlayer();
+      if (isPlayerMode) {
+        if (id && id === myKey && document.getElementById('ps-attente')?.classList.contains('active')) goToRouePlayer();
+      } else {
+        if (id) showRoueProj(id);
       }
-      if (!isPlayerMode && id) showRoueProj(id);
     });
     db.ref(`${FB_PATH}/spin`).on('value', snap => {
       const d = snap.val();
@@ -936,20 +940,9 @@ function init() {
     document.getElementById('view-player').style.justifyContent = 'flex-start';
     document.getElementById('view-player').classList.add('active');
     document.getElementById('view-proj').classList.remove('active');
-    // Récupérer clé stockée
-    myKey = localStorage.getItem('llspin_key');
-    // Toujours montrer l'inscription en premier
-    // Si session précédente trouvée, proposer un lien "Reprendre"
-    if (myKey) {
-      const link = document.createElement('div');
-      link.style.cssText = 'font-size:.65rem;color:var(--dim);text-align:center;margin-top:4px;cursor:pointer;text-decoration:underline;';
-      link.textContent = 'D\u00e9j\u00e0 inscrit\u00b7e ? Reprendre ma session';
-      link.onclick = () => {
-        if (joueurs[myKey]) restorePlayerState();
-        else link.textContent = 'Session introuvable\u2026';
-      };
-      document.querySelector('#ps-inscription .p-inner')?.appendChild(link);
-    }
+    // TOUJOURS commencer par l'inscription
+    localStorage.removeItem('llspin_key');
+    myKey = null;
     initFB();
   } else {
     initFB();
@@ -988,14 +981,17 @@ function submitInscription() {
   if (!nom) { showErr(`Saisis ton pr\u00e9nom`); return; }
   if (!email || !email.includes('@')) { showErr(`Email invalide`); return; }
   if (!co) { showErr(`Nom de ton entreprise ?`); return; }
-  const data = { nom, co, email, status: 'inscrit', ts: Date.now() };
+  const tel = document.getElementById('p-tel')?.value?.trim() || '';
+  // Anti-replay
+  const won = Object.values(joueurs).find(j => j.email && j.email.toLowerCase() === email.toLowerCase() && j.status === 'gagne');
+  if (won) { showErr('🏆 Cet email a déjà un lot ! Merci d\'avoir joué.'); return; }
+  const data = { nom, co, email, tel, status: 'inscrit', ts: Date.now() };
   if (db) {
     const ref = db.ref(`${FB_PATH}/joueurs`).push(data);
     myKey = ref.key;
-    localStorage.setItem('llspin_key', myKey);
+    // Pas de localStorage : fresh start à chaque scan
   } else {
     myKey = 'local_' + Date.now();
-    localStorage.setItem('llspin_key', myKey);
   }
   goToCategories();
 }
@@ -1325,9 +1321,9 @@ function renderLegende() {
   const c = document.getElementById('legende-lots');
   if (!c) return;
   c.innerHTML = LOTS.map((lot, i) => `
-    <div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);">
-      <div style="width:22px;height:22px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.72rem;color:#fff;flex-shrink:0;">${i+1}</div>
-      <span style="font-size:.7rem;color:var(--soft);">${esc(lot)}</span>
+    <div style="display:flex;align-items:center;gap:4px;padding:2px 0;">
+      <div style="width:18px;height:18px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.62rem;color:#fff;flex-shrink:0;font-weight:700;">${i+1}</div>
+      <span style="font-size:.58rem;color:var(--soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(lot)}</span>
     </div>`).join('');
 }
 
@@ -1402,7 +1398,7 @@ function buildSettingsUI() {
     <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--bd);">
       <div style="flex:1;min-width:0;">
         <div style="font-weight:800;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(j.nom)}</div>
-        <div style="font-size:.62rem;color:var(--dim);">${esc(j.co||'')}</div>
+        <div style="font-size:.6rem;color:var(--dim);">${esc(j.co||'')}${j.email?' · '+esc(j.email):''}</div>
       </div>
       <div style="font-size:.62rem;color:${badgeColor[j.status||'inscrit']};white-space:nowrap;">${badgeTxt[j.status||'inscrit']}</div>
     </div>`).join('')
