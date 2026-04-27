@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v2.2 -->
+<!-- LUMIIA REDA SPIN — v2.3 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -46,29 +46,29 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 
 /* ── BANDEAU PERMANENT ── */
 #bandeau{
-  height:52px;flex-shrink:0;
-  background:linear-gradient(90deg,rgba(77,217,232,.12),rgba(168,85,247,.12));
+  height:64px;flex-shrink:0;
+  background:linear-gradient(90deg,rgba(77,217,232,.14),rgba(168,85,247,.14));
   border-bottom:1px solid var(--bd);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 22px;position:fixed;top:0;left:0;right:0;z-index:300;
+  padding:0 24px;position:fixed;top:0;left:0;right:0;z-index:300;
 }
 #bandeau-left{
   flex:1;
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(1rem, 2.2vw, 1.5rem);
+  font-size:clamp(1.2rem, 2.8vw, 2rem);
   letter-spacing:.22em;
   background:linear-gradient(90deg,var(--cyan),var(--mag));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   white-space:nowrap;
 }
-#bandeau-right{font-size:.75rem;color:var(--dim);letter-spacing:.08em;white-space:nowrap;padding-left:16px;}
+#bandeau-right{font-size:.82rem;color:var(--dim);letter-spacing:.08em;white-space:nowrap;padding-left:16px;}
 #bandeau-right a{color:var(--cyan);text-decoration:none;}
 
 /* ── TOPBAR ── */
 #topbar{
   height:46px;background:rgba(5,0,26,.95);border-bottom:1px solid var(--bd);
   display:flex;align-items:center;
-  position:fixed;top:52px;left:0;right:0;z-index:200;
+  position:fixed;top:64px;left:0;right:0;z-index:200;
 }
 .tb-logo{
   padding:0 14px;font-family:'Bebas Neue',sans-serif;font-size:.8rem;
@@ -94,7 +94,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 .tb-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
 
 /* ── VUES ── */
-.view{display:none;position:fixed;top:98px;left:0;right:0;bottom:0;}
+.view{display:none;position:fixed;top:110px;left:0;right:0;bottom:0;}
 .view.active{display:flex;}
 
 /* ══════════════════════════════════
@@ -352,7 +352,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
    SETTINGS
 ══════════════════════════════════ */
 #settings-panel{
-  position:fixed;top:98px;right:0;bottom:0;width:min(500px,92vw);
+  position:fixed;top:110px;right:0;bottom:0;width:min(500px,92vw);
   background:var(--panel);border-left:2px solid var(--violet);
   z-index:400;overflow-y:auto;padding:24px;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);
@@ -445,7 +445,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v2.2</div>
+  <div class="tb-v">v2.3</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -488,36 +488,36 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       <div id="wait-msg">
         <h2>LUMIIA REDA SPIN</h2>
         <div style="
-          max-width:580px;margin:0 auto;
+          max-width:700px;margin:0 auto;
           background:rgba(255,255,255,.04);border:1px solid var(--bd);
-          border-radius:20px;padding:32px 36px;text-align:left;margin-top:16px;
+          border-radius:22px;padding:40px 48px;text-align:left;margin-top:18px;
         ">
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.14em;color:var(--cyan);margin-bottom:18px;text-align:center;">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.14em;color:var(--cyan);margin-bottom:24px;text-align:center;">
             🎯 RÈGLES DU JEU
           </div>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--cyan);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
-              <div><strong style="color:var(--tx);">Scanne le QR code</strong><br><span style="color:var(--soft);font-size:.82rem;">Inscris ton prénom, ton entreprise et ton email</span></div>
+          <div style="display:flex;flex-direction:column;gap:20px;">
+            <div style="display:flex;gap:18px;align-items:flex-start;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--cyan);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+              <div><strong style="color:var(--tx);font-size:1.05rem;">Scanne le QR code</strong><br><span style="color:var(--soft);font-size:.92rem;">Inscris ton prénom, ton entreprise et ton email</span></div>
             </div>
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--violet);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
-              <div><strong style="color:var(--tx);">Choisis ta catégorie de quiz</strong><br><span style="color:var(--soft);font-size:.82rem;">Musique, Sport, Cinéma, Histoire, Géographie, Science, Cuisine ou Culture G.</span></div>
+            <div style="display:flex;gap:18px;align-items:flex-start;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--violet);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+              <div><strong style="color:var(--tx);font-size:1.05rem;">Choisis ta catégorie de quiz</strong><br><span style="color:var(--soft);font-size:.92rem;">Musique, Sport, Cinéma, Histoire, Géographie, Science, Cuisine ou Culture G.</span></div>
             </div>
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--mag);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
-              <div><strong style="color:var(--tx);">Réponds aux 5 questions</strong><br><span style="color:var(--soft);font-size:.82rem;">Tu as 15 secondes par question. Il faut toutes les réussir pour gagner.</span></div>
+            <div style="display:flex;gap:18px;align-items:flex-start;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--mag);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+              <div><strong style="color:var(--tx);font-size:1.05rem;">Réponds aux 5 questions</strong><br><span style="color:var(--soft);font-size:.92rem;">Tu as 15 secondes par question. Il faut toutes les réussir pour gagner.</span></div>
             </div>
-            <div style="display:flex;gap:14px;align-items:flex-start;">
-              <div style="width:32px;height:32px;border-radius:50%;background:var(--lime);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
-              <div><strong style="color:var(--tx);">Lance la roue !</strong><br><span style="color:var(--soft);font-size:.82rem;">Reviens au stand — l'animateur te sélectionne et tu tournes la roue pour gagner un cadeau LUMIIA.</span></div>
+            <div style="display:flex;gap:18px;align-items:flex-start;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--lime);color:var(--deep);font-family:'Bebas Neue',sans-serif;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+              <div><strong style="color:var(--tx);font-size:1.05rem;">Lance la roue !</strong><br><span style="color:var(--soft);font-size:.92rem;">Reviens au stand — l'animateur te sélectionne et tu tournes la roue pour gagner un cadeau LUMIIA ou les délices du maraîcher.</span></div>
             </div>
           </div>
-          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--bd);text-align:center;font-size:.75rem;color:var(--dim);">
+          <div style="margin-top:26px;padding-top:20px;border-top:1px solid var(--bd);text-align:center;font-size:.85rem;color:var(--dim);">
             Tentatives illimitées · Gratuit · Cadeaux à gagner
           </div>
         </div>
-        <p style="margin-top:18px;font-size:.78rem;color:var(--dim);">Sélectionne un joueur <strong style="color:var(--ok);">Validé ✅</strong> dans la liste pour lancer la roue</p>
+        <p style="margin-top:20px;font-size:.82rem;color:var(--dim);">Sélectionne un joueur <strong style="color:var(--ok);">Validé ✅</strong> dans la liste pour lancer la roue</p>
       </div>
       <div id="roue-zone">
         <div class="roue-joueur-label" id="roue-joueur-lbl">—</div>
@@ -872,6 +872,7 @@ function initFB() {
   try {
     if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
     db = firebase.database();
+    let firstSync = true;
     db.ref(`${FB_PATH}/joueurs`).on('value', snap => {
       // Firebase connecté
       const dot = document.getElementById('fb-dot');
@@ -882,11 +883,24 @@ function initFB() {
       snap.forEach(c => { joueurs[c.key] = c.val(); });
       renderJoueurs();
       updateStats();
-      if (isPlayerMode && myKey) checkMyStatus();
+      // Ne restaurer l'état que si le joueur a déjà dépassé l'inscription
+      // et seulement au premier sync — jamais sur les updates suivantes
+      if (isPlayerMode && myKey && firstSync) {
+        firstSync = false;
+        const j = joueurs[myKey];
+        // Restaurer uniquement si déjà gagné — sinon toujours inscription
+        if (j && j.status === 'gagne') restorePlayerState();
+      } else {
+        firstSync = false;
+      }
     });
     db.ref(`${FB_PATH}/actif`).on('value', snap => {
       const id = snap.val();
-      if (isPlayerMode && id === myKey) goToRouePlayer();
+      // Rediriger vers roue uniquement si : c'est bien ce joueur ET il est sur l'écran attente
+      if (isPlayerMode && id === myKey) {
+        const attenteScreen = document.getElementById('ps-attente');
+        if (attenteScreen && attenteScreen.classList.contains('active')) goToRouePlayer();
+      }
       if (!isPlayerMode && id) showRoueProj(id);
     });
     db.ref(`${FB_PATH}/spin`).on('value', snap => {
@@ -1090,10 +1104,14 @@ function showQuizResult() {
   const btn = document.getElementById('res-action');
   const btnChange = document.getElementById('res-change-cat');
   if (success) {
-    btn.textContent = `\u2705 En attente du stand`;
+    btn.textContent = `\u2705 Quiz valid\u00e9 \u2014 viens au stand !`;
     btn.disabled = true;
     btnChange.style.display = 'none';
     if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'valide' });
+    goPlayerScreen('ps-attente');
+    document.getElementById('attente-msg').textContent = `\uD83C\uDFC6 Quiz valid\u00e9 !`;
+    document.getElementById('attente-sub').textContent = `Rends-toi au stand LUMIIA \u2014 l\u2019animateur va te s\u00e9lectionner pour lancer la roue !`;
+    return;
   } else {
     btn.textContent = `\uD83D\uDD04 Retenter`;
     btn.disabled = false;
