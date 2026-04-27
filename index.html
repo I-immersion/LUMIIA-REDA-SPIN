@@ -1,11 +1,36 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v2.0 -->
+<!-- LUMIIA REDA SPIN — v2.1 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>LUMIIA REDA SPIN</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+// Routing immédiat avant rendu — évite le flash de la projection
+if(window.location.search.includes('player')){
+  document.documentElement.classList.add('player-mode');
+}
+</script>
+<style>
+html.player-mode #topbar,
+html.player-mode #bandeau,
+html.player-mode #view-proj,
+html.player-mode #settings-panel { display:none!important; }
+html.player-mode #view-player {
+  display:flex!important;
+  top:0!important;
+  background:var(--cosmos)!important;
+  justify-content:flex-start!important;
+}
+html.player-mode #player-app {
+  border-radius:0!important;
+  min-height:100dvh!important;
+  max-height:none!important;
+  border:none!important;
+  box-shadow:none!important;
+}
+</style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
@@ -46,7 +71,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
   letter-spacing:.2em;color:rgba(255,255,255,.3);border-right:1px solid var(--bd);
   white-space:nowrap;
 }
-.tb-v{font-size:.45rem;color:rgba(255,255,255,.18);font-family:monospace;padding:0 8px;border-right:1px solid var(--bd);}
+.tb-v{font-size:.72rem;font-weight:700;color:var(--lime);font-family:'Bebas Neue',sans-serif;letter-spacing:.12em;padding:0 10px;border-right:1px solid var(--bd);}
 .tb-tabs{display:flex;height:100%;}
 .tb-tab{
   padding:0 18px;border:none;background:transparent;color:var(--dim);
@@ -416,7 +441,14 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v2.0</div>
+  <div class="tb-v">v2.1</div>
+  <div id="fb-indicator" title="Firebase" style="
+    display:flex;align-items:center;gap:5px;padding:0 10px;
+    border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
+  ">
+    <div id="fb-dot" style="width:7px;height:7px;border-radius:50%;background:rgba(255,68,68,.5);transition:background .4s;"></div>
+    <span id="fb-lbl">Firebase</span>
+  </div>
   <div class="tb-tabs">
     <button class="tb-tab active" onclick="setView('proj')">🎬 PROJECTION</button>
     <button class="tb-tab" onclick="setView('player')">📱 JOUEURS</button>
@@ -482,6 +514,10 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
           <div class="s-box"><div class="s-n" id="s-gagnes">0</div><div class="s-l">Lots gagnés</div></div>
           <div class="s-box"><div class="s-n" id="s-encours">0</div><div class="s-l">En cours</div></div>
         </div>
+      </div>
+      <div>
+        <div class="r-section-lbl">🎁 LÉGENDE ROUE</div>
+        <div id="legende-lots" style="display:flex;flex-direction:column;gap:3px;"></div>
       </div>
       <div class="qr-wrap">
         <div class="r-section-lbl">📱 QR JOUEURS</div>
@@ -799,6 +835,11 @@ function initFB() {
     if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
     db = firebase.database();
     db.ref(`${FB_PATH}/joueurs`).on('value', snap => {
+      // Firebase connecté
+      const dot = document.getElementById('fb-dot');
+      const lbl = document.getElementById('fb-lbl');
+      if (dot) { dot.style.background = '#4ade80'; }
+      if (lbl) { lbl.style.color = '#4ade80'; }
       joueurs = {};
       snap.forEach(c => { joueurs[c.key] = c.val(); });
       renderJoueurs();
@@ -822,6 +863,7 @@ function initFB() {
       }
       drawWheel('proj-canvas', getWheelSize(), wheelAngle);
       drawWheel('player-canvas', 220, wheelAngle);
+      renderLegende();
     });
   } catch(e) { console.warn('FB', e); }
 }
@@ -1074,20 +1116,16 @@ function drawWheel(canvasId, size, angle) {
     ctx.fillStyle = LOT_COLORS[i]; ctx.fill();
     ctx.strokeStyle = '#05001a'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.restore();
-    // Emoji
-    const tx = cx + Math.cos(mid) * r * 0.65;
-    const ty = cx + Math.sin(mid) * r * 0.65;
+    // Numéro en grand
+    const tx = cx + Math.cos(mid) * r * 0.62;
+    const ty = cx + Math.sin(mid) * r * 0.62;
     ctx.save();
     ctx.translate(tx, ty); ctx.rotate(mid + Math.PI / 2);
-    ctx.font = (size * 0.065) + 'px serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-    ctx.fillText(LOT_EMOJIS[i], 0, 0);
-    // Texte court
-    const short = lot.length > 12 ? lot.substring(0, 11) + '\u2026' : lot;
-    ctx.font = `bold ${size * 0.033}px Nunito, sans-serif`;
-    ctx.fillStyle = 'rgba(255,255,255,.85)';
-    ctx.textBaseline = 'top';
-    ctx.fillText(short, 0, 2);
+    ctx.font = `bold ${size * 0.11}px Bebas Neue, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,.95)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 4; ctx.shadowColor = 'rgba(0,0,0,.5)';
+    ctx.fillText(String(i + 1), 0, 0);
     ctx.restore();
   });
   // Centre
@@ -1216,6 +1254,16 @@ function closeOverlay() {
 // ══════════════════════
 // RENDER JOUEURS
 // ══════════════════════
+function renderLegende() {
+  const c = document.getElementById('legende-lots');
+  if (!c) return;
+  c.innerHTML = LOTS.map((lot, i) => `
+    <div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+      <div style="width:22px;height:22px;border-radius:50%;background:${LOT_COLORS[i]};display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:.72rem;color:#fff;flex-shrink:0;">${i+1}</div>
+      <span style="font-size:.7rem;color:var(--soft);">${esc(lot)}</span>
+    </div>`).join('');
+}
+
 function renderJoueurs() {
   document.getElementById('nb-j').textContent = Object.keys(joueurs).length;
   const c = document.getElementById('j-list');
@@ -1296,6 +1344,7 @@ function saveSettings() {
   if (db) db.ref(`${FB_PATH}/settings`).set({ lots: LOTS, duree: cfg.duree });
   drawWheel('proj-canvas', getWheelSize(), wheelAngle);
   drawWheel('player-canvas', 220, wheelAngle);
+  renderLegende();
   toggleSettings();
 }
 
