@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.13 -->
+<!-- LUMIIA REDA SPIN — v3.14 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.13</div>
+  <div class="tb-v">v3.14</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -589,7 +589,6 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
       </div>
       <div>
         <div class="r-section-lbl">🎁 LÉGENDE ROUE</div>
-        <div id="legende-lots-right" style="display:none;"></div>
       </div>
       <div class="qr-wrap">
         <div class="r-section-lbl">📱 QR JOUEURS</div>
@@ -1277,7 +1276,6 @@ let joueurActif = null;
 let isPlayerMode = false;
 let myKey = null;
 let wheelAngle = 0;
-let playerJustValidated = false;
 // Charger défauts locaux si Firebase pas encore dispo
 try {
   const saved = JSON.parse(localStorage.getItem('llspin_defaults') || 'null');
@@ -1549,27 +1547,9 @@ function showQuizResult() {
 
 function retryQuiz() { goToCategories(); }
 
-function checkMyStatus() {
-  const j = joueurs[myKey];
-  if (!j) return;
-  if (j.status === 'gagne') {
-    goPlayerScreen('ps-attente');
-    document.getElementById('attente-msg').textContent = `Cadeau gagn\u00e9\u00a0!`;
-    document.getElementById('attente-sub').textContent = `Tu as gagn\u00e9\u00a0: ${j.lot || ''}. Merci d\u2019\u00eatre pass\u00e9 au stand LUMIIA\u00a0!`;
-  }
-}
 
-function restorePlayerState() {
-  const j = joueurs[myKey];
-  if (!j) return;
-  if (j.status === 'valide') {
-    goPlayerScreen('ps-attente');
-  } else if (j.status === 'gagne') {
-    checkMyStatus();
-  } else {
-    goToCategories();
-  }
-}
+
+
 
 function goToRouePlayer() {
   const btn = document.getElementById('player-spin-btn');
@@ -1778,7 +1758,6 @@ function onSpinEnd(target, joueurKey) {
     STOCKS[target]--;
     if (db) db.ref(FB_PATH + '/settings/stocks').set(STOCKS);
   }
-  // -1 = infini : pas de décrémentation
   const j = joueurs[joueurKey];
   const nom = j ? j.nom : '?';
   // Sauvegarder
@@ -2334,9 +2313,6 @@ function launchTirageBg() {
   }
 }
 
-// Mettre à jour la liste tirage quand les joueurs changent
-const _origRenderJoueurs = renderJoueurs;
-// Appeler renderTirageListe si on est sur cet onglet
 function maybeUpdateTirage() {
   if (document.getElementById('view-tirage')?.classList.contains('active')) renderTirageListe();
 }
