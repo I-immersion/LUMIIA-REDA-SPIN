@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.0 -->
+<!-- LUMIIA REDA SPIN — v3.1 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -416,11 +416,20 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 ══════════════════════════════════ */
 #ov-result{
   display:none;position:fixed;inset:0;z-index:500;
-  background:rgba(5,0,26,.97);
+  background:rgba(5,0,26,.72);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;padding:40px;
+  text-align:center;padding:20px;
 }
 #ov-result.show{display:flex;}
+#ov-card{
+  background:linear-gradient(160deg,rgba(20,9,50,.97),rgba(11,5,32,.97));
+  border:2px solid rgba(184,255,60,.35);
+  border-radius:24px;padding:40px 48px;max-width:580px;width:100%;
+  box-shadow:0 0 60px rgba(184,255,60,.15),0 0 120px rgba(168,85,247,.15);
+  animation:cardpop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes cardpop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
 #ov-r-emoji{font-size:clamp(4rem,10vw,7rem);margin-bottom:16px;animation:bigpop .6s cubic-bezier(.34,1.56,.64,1) both;}
 @keyframes bigpop{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1);opacity:1}}
 #ov-r-joueur{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
@@ -455,7 +464,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.0</div>
+  <div class="tb-v">v3.1</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -699,11 +708,13 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 
 <!-- OVERLAY RÉSULTAT -->
 <div id="ov-result">
-  <span id="ov-r-emoji">🎁</span>
-  <div id="ov-r-joueur"></div>
-  <div id="ov-r-lot">Cadeau</div>
-  <div style="font-size:.82rem;color:var(--soft);margin-top:12px;max-width:460px;text-align:center;">📧 Vous recevrez votre lot par email — nous vous contacterons manuellement.</div>
-  <button id="ov-r-close" onclick="closeOverlay()">✕ Fermer</button>
+  <div id="ov-card">
+    <span id="ov-r-emoji" style="font-size:clamp(3rem,8vw,6rem);display:block;margin-bottom:14px;animation:bigpop .6s cubic-bezier(.34,1.56,.64,1) both;">🎁</span>
+    <div id="ov-r-joueur" style="font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;"></div>
+    <div id="ov-r-lot" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,5vw,4rem);letter-spacing:.05em;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Cadeau</div>
+    <div style="font-size:.82rem;color:var(--soft);line-height:1.6;margin-bottom:20px;">📧 Vous recevrez votre lot par email — nous vous contacterons manuellement.</div>
+    <button id="ov-r-close" onclick="closeOverlay()" style="padding:10px 32px;border:1px solid rgba(255,255,255,.2);border-radius:50px;background:rgba(255,255,255,.08);color:var(--tx);font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;cursor:pointer;">✕ FERMER <span style="font-size:.6rem;color:var(--dim);">(ou ESPACE)</span></button>
+  </div>
 </div>
 
 <div id="confetti-wrap"></div>
@@ -725,6 +736,46 @@ const QUIZ_DATA = {
       { q: `Quelle chanteuse s'appelle aussi "Queen B" ?`, o: [`Rihanna`, `Beyoncé`, `Adele`, `Lady Gaga`], c: 1 },
       { q: `Quel instrument joue principalement Jimi Hendrix ?`, o: [`Batterie`, `Piano`, `Guitare`, `Basse`], c: 2 },
       { q: `Qui a composé la "Lettre à Élise" ?`, o: [`Mozart`, `Chopin`, `Beethoven`, `Bach`], c: 2 },
+      { q: `Quel groupe a sorti "Bohemian Rhapsody" ?`, o: [`The Beatles`, `Queen`, `Led Zeppelin`, `Pink Floyd`], c: 1 },
+      { q: `Dans quelle ville est né Elvis Presley ?`, o: [`Memphis`, `Nashville`, `Tupelo`, `Atlanta`], c: 2 },
+      { q: `Quel instrument joue Elton John ?`, o: [`Guitare`, `Piano`, `Saxophone`, `Violon`], c: 1 },
+      { q: `Qui chante "Hello" sorti en 2015 ?`, o: [`Beyoncé`, `Taylor Swift`, `Adele`, `Rihanna`], c: 2 },
+      { q: `Quel groupe britannique a sorti "Abbey Road" ?`, o: [`Rolling Stones`, `The Who`, `The Beatles`, `The Kinks`], c: 2 },
+      { q: `Combien de cordes a une guitare classique ?`, o: [`4`, `5`, `6`, `7`], c: 2 },
+      { q: `Quel chanteur est surnommé "The King of Pop" ?`, o: [`Prince`, `Michael Jackson`, `David Bowie`, `Freddie Mercury`], c: 1 },
+      { q: `Quelle note suit le "sol" dans la gamme ?`, o: [`Fa`, `La`, `Si`, `Ré`], c: 1 },
+      { q: `Qui a composé "La Flûte enchantée" ?`, o: [`Beethoven`, `Bach`, `Mozart`, `Handel`], c: 2 },
+      { q: `Quel pays est le berceau du reggae ?`, o: [`Brésil`, `Jamaïque`, `Cuba`, `Trinidad`], c: 1 },
+      { q: `Quel artiste a sorti "Purple Rain" ?`, o: [`David Bowie`, `Prince`, `Freddie Mercury`, `Elton John`], c: 1 },
+      { q: `Quel groupe a sorti "Hotel California" ?`, o: [`Eagles`, `Fleetwood Mac`, `Dire Straits`, `Steely Dan`], c: 0 },
+      { q: `Dans quelle décennie est né le rock'n'roll ?`, o: [`1940s`, `1950s`, `1960s`, `1970s`], c: 1 },
+      { q: `Qui est le chanteur de U2 ?`, o: [`Dave Grohl`, `Bono`, `Thom Yorke`, `Chris Martin`], c: 1 },
+      { q: `Quel instrument est au centre du jazz ?`, o: [`Violon`, `Saxophone`, `Hautbois`, `Accordéon`], c: 1 },
+      { q: `Combien de touches a un piano standard ?`, o: [`76`, `88`, `96`, `100`], c: 1 },
+      { q: `Quel groupe a sorti "Smells Like Teen Spirit" ?`, o: [`Pearl Jam`, `Soundgarden`, `Nirvana`, `Alice in Chains`], c: 2 },
+      { q: `Quelle diva a sorti "I Will Always Love You" ?`, o: [`Mariah Carey`, `Whitney Houston`, `Celine Dion`, `Tina Turner`], c: 1 },
+      { q: `Quel producteur a collaboré avec Madonna dès les années 80 ?`, o: [`Quincy Jones`, `Nile Rodgers`, `Trevor Horn`, `Rick Rubin`], c: 1 },
+      { q: `Quel artiste français est connu pour "Ne me quitte pas" ?`, o: [`Serge Gainsbourg`, `Charles Aznavour`, `Jacques Brel`, `Edith Piaf`], c: 2 },
+      { q: `Quel groupe a sorti "Stairway to Heaven" ?`, o: [`Deep Purple`, `Black Sabbath`, `Led Zeppelin`, `The Who`], c: 2 },
+      { q: `Qui chante "Rolling in the Deep" ?`, o: [`Dua Lipa`, `Amy Winehouse`, `Adele`, `Sia`], c: 2 },
+      { q: `Quel pays a inventé la samba ?`, o: [`Argentine`, `Mexique`, `Brésil`, `Colombie`], c: 2 },
+      { q: `Quel artiste est connu pour le tube "Gangnam Style" ?`, o: [`BTS`, `PSY`, `G-Dragon`, `BigBang`], c: 1 },
+      { q: `Qui a composé les "Quatre Saisons" ?`, o: [`Bach`, `Handel`, `Vivaldi`, `Telemann`], c: 2 },
+      { q: `Quel groupe a sorti "Back in Black" ?`, o: [`Metallica`, `AC/DC`, `Iron Maiden`, `Judas Priest`], c: 1 },
+      { q: `Combien de membres comptait les Beatles à leur apogée ?`, o: [`3`, `4`, `5`, `6`], c: 1 },
+      { q: `Quel artiste a popularisé le "moonwalk" ?`, o: [`James Brown`, `Prince`, `Michael Jackson`, `MC Hammer`], c: 2 },
+      { q: `Quel chanteur français a sorti "La Vie en rose" ?`, o: [`Charles Trenet`, `Georges Brassens`, `Edith Piaf`, `Serge Gainsbourg`], c: 2 },
+      { q: `Quel groupe chante "Losing My Religion" ?`, o: [`R.E.M.`, `U2`, `Radiohead`, `The Cure`], c: 0 },
+      { q: `Qui chante "Shallow" dans "A Star is Born" ?`, o: [`Ariana Grande`, `Lady Gaga`, `Pink`, `Katy Perry`], c: 1 },
+      { q: `Quel instrument est aussi appelé "piano à queue" ?`, o: [`Clavecin`, `Piano droit`, `Piano à queue`, `Clavicorde`], c: 2 },
+      { q: `Quel DJ a sorti "One More Time" ?`, o: [`David Guetta`, `Daft Punk`, `Calvin Harris`, `Tiesto`], c: 1 },
+      { q: `Quelle chanteuse islandaise est connue pour son style avant-gardiste ?`, o: [`Lykke Li`, `Bjork`, `Agnes Obel`, `Sigrid`], c: 1 },
+      { q: `Quel groupe de punk a sorti "London Calling" ?`, o: [`Sex Pistols`, `The Clash`, `The Damned`, `Buzzcocks`], c: 1 },
+      { q: `Qui chante "Blinding Lights" ?`, o: [`The Weekend`, `Drake`, `Post Malone`, `Travis Scott`], c: 0 },
+      { q: `Quel opéra met en scène le personnage de Violetta ?`, o: [`Tosca`, `La Traviata`, `Carmen`, `Rigoletto`], c: 1 },
+      { q: `Quel guitariste est connu pour le riff de "Smoke on the Water" ?`, o: [`Jimmy Page`, `Ritchie Blackmore`, `Eric Clapton`, `Jeff Beck`], c: 1 },
+      { q: `Quelle chanteuse a sorti "Bad Guy" en 2019 ?`, o: [`Dua Lipa`, `Ariana Grande`, `Billie Eilish`, `Halsey`], c: 2 },
+      { q: `Quel groupe a sorti "Don't Stop Believin'" ?`, o: [`Journey`, `Foreigner`, `Toto`, `Boston`], c: 0 },
     ]
   },
   sport: {
@@ -741,7 +792,47 @@ const QUIZ_DATA = {
       { q: `Combien de joueurs dans une équipe de basketball ?`, o: [`4`, `5`, `6`, `7`], c: 1 },
       { q: `Dans quel sport marque-t-on un "essai" ?`, o: [`Football`, `Rugby`, `Handball`, `Volleyball`], c: 1 },
       { q: `Quel pays a remporté le plus de Coupes du Monde de football ?`, o: [`Allemagne`, `Argentine`, `Brésil`, `France`], c: 2 },
-      { q: `Combien de sets maximum dans un match de tennis Grand Chelem (hommes) ?`, o: [`3`, `4`, `5`, `6`], c: 2 },
+      { q: `Combien de sets maximum dans un match de tennis Grand Chelem hommes ?`, o: [`3`, `4`, `5`, `6`], c: 2 },
+      { q: `Quel athlète est surnommé "Usain" et détient le record du 100m ?`, o: [`Tyson Gay`, `Asafa Powell`, `Usain Bolt`, `Justin Gatlin`], c: 2 },
+      { q: `Dans quel pays se déroule le Tour de France ?`, o: [`Belgique`, `France`, `Italie`, `Espagne`], c: 1 },
+      { q: `Quel club a remporté le plus de Ligues des Champions UEFA ?`, o: [`Barcelona`, `Bayern Munich`, `Real Madrid`, `Liverpool`], c: 2 },
+      { q: `Combien de points vaut un panier à 3 points au basketball ?`, o: [`2`, `3`, `4`, `5`], c: 1 },
+      { q: `Quel sport se joue avec une raquette et une balle sur herbe ?`, o: [`Badminton`, `Tennis`, `Squash`, `Padel`], c: 1 },
+      { q: `Dans quelle ville se sont tenues les JO d'été 2024 ?`, o: [`Londres`, `Tokyo`, `Paris`, `Los Angeles`], c: 2 },
+      { q: `Quel footballeur a remporté le plus de Ballons d'Or ?`, o: [`Cristiano Ronaldo`, `Zinedine Zidane`, `Lionel Messi`, `Ronaldinho`], c: 2 },
+      { q: `Combien de km mesure un marathon ?`, o: [`36`, `40`, `42.195`, `45`], c: 2 },
+      { q: `Dans quel sport parle-t-on de "touché" ?`, o: [`Rugby`, `Football américain`, `Handball`, `Hockey`], c: 1 },
+      { q: `Quelle équipe a remporté la Coupe du Monde 2022 ?`, o: [`France`, `Brésil`, `Argentine`, `Maroc`], c: 2 },
+      { q: `Combien de joueurs dans une équipe de volleyball ?`, o: [`5`, `6`, `7`, `8`], c: 1 },
+      { q: `Quel sport pratique Serena Williams ?`, o: [`Golf`, `Badminton`, `Tennis`, `Squash`], c: 2 },
+      { q: `Dans quel pays est né le judo ?`, o: [`Chine`, `Corée`, `Japon`, `Thaïlande`], c: 2 },
+      { q: `Quelle distance nage-t-on dans le 400m nage libre ?`, o: [`400m`, `16 longueurs`, `8 longueurs`, `4 longueurs`], c: 1 },
+      { q: `Quel pays a inventé le basketball ?`, o: [`États-Unis`, `Canada`, `Brésil`, `Australie`], c: 0 },
+      { q: `Combien de chevaux au maximum dans une équipe de polo ?`, o: [`2`, `4`, `6`, `8`], c: 1 },
+      { q: `Quel sport se joue avec un palet ?`, o: [`Curling`, `Hockey sur glace`, `Ringuette`, `Bandy`], c: 1 },
+      { q: `Quel club espagnol s'appelle "Les Merengues" ?`, o: [`Barcelone`, `Atletico Madrid`, `Séville`, `Real Madrid`], c: 3 },
+      { q: `Dans quel sport parle-t-on de "chelem" ?`, o: [`Tennis`, `Bridge`, `Les deux`, `Ni l'un ni l'autre`], c: 2 },
+      { q: `Quelle discipline olympique utilise un arc ?`, o: [`Javelot`, `Tir à l'arc`, `Biathlon`, `Pentathlon`], c: 1 },
+      { q: `Quel pays a le plus de médailles d'or olympiques cumulées ?`, o: [`Russie`, `Chine`, `USA`, `Grande-Bretagne`], c: 2 },
+      { q: `Combien de joueurs par équipe au polo ?`, o: [`2`, `4`, `6`, `8`], c: 1 },
+      { q: `Dans quel sport fait-on des "slaloms" ?`, o: [`Ski`, `Natation`, `Cyclisme`, `Tous ces sports`], c: 0 },
+      { q: `Quel événement sportif a lieu tous les 4 ans sauf exceptions ?`, o: [`Tour de France`, `JO`, `Coupe du Monde`, `Les deux derniers`], c: 1 },
+      { q: `Quel club anglais est surnommé "Les Reds" ?`, o: [`Arsenal`, `Manchester Utd`, `Chelsea`, `Liverpool`], c: 3 },
+      { q: `Combien de points vaut un but en football ?`, o: [`1`, `2`, `3`, `5`], c: 0 },
+      { q: `Quel sport se pratique dans un "dojo" ?`, o: [`Karaté`, `Tennis de table`, `Boxe`, `Escrime`], c: 0 },
+      { q: `Quelle ville accueille Roland-Garros ?`, o: [`Londres`, `New York`, `Paris`, `Melbourne`], c: 2 },
+      { q: `Combien de disciplines compte le triathlon olympique ?`, o: [`2`, `3`, `4`, `5`], c: 1 },
+      { q: `Dans quel sport parle-t-on de "birdie" ?`, o: [`Tennis`, `Golf`, `Badminton`, `Cricket`], c: 1 },
+      { q: `Quel pays a inventé le rugby ?`, o: [`France`, `Irlande`, `Angleterre`, `Écosse`], c: 2 },
+      { q: `Quel athlète a remporté 6 titres mondiaux de Formule 1 ?`, o: [`Ayrton Senna`, `Michael Schumacher`, `Lewis Hamilton`, `Sebastian Vettel`], c: 2 },
+      { q: `Combien de joueurs dans une équipe de handball ?`, o: [`5`, `6`, `7`, `8`], c: 2 },
+      { q: `Dans quel sport fait-on des "dribbles" ?`, o: [`Football`, `Basketball`, `Les deux`, `Ni l'un ni l'autre`], c: 2 },
+      { q: `Quel pays a remporté la Coupe du Monde de rugby 2023 ?`, o: [`Nouvelle-Zélande`, `Afrique du Sud`, `Irlande`, `France`], c: 1 },
+      { q: `Combien de fautes avant l'exclusion au basketball ?`, o: [`4`, `5`, `6`, `3`], c: 1 },
+      { q: `Quel sport se joue avec un "filet" de badminton ?`, o: [`Badminton`, `Tennis`, `Volleyball`, `Tous`], c: 0 },
+      { q: `Quelle est la longueur d'un terrain de football ?`, o: [`90-120m`, `100m fixe`, `105m fixe`, `80-100m`], c: 0 },
+      { q: `Dans quel sport parle-t-on de "KO" ?`, o: [`Boxe`, `Karaté`, `MMA`, `Tous ces sports`], c: 3 },
+      { q: `Qui a coaché l'équipe de France lors de la victoire en 1998 ?`, o: [`Michel Platini`, `Aimé Jacquet`, `Roger Lemerre`, `Gérard Houllier`], c: 1 },
     ]
   },
   cinema: {
@@ -756,9 +847,49 @@ const QUIZ_DATA = {
       { q: `Quel acteur joue Iron Man ?`, o: [`Chris Evans`, `Robert Downey Jr`, `Chris Hemsworth`, `Mark Ruffalo`], c: 1 },
       { q: `Quelle est la planète dans "Avatar" ?`, o: [`Pandora`, `Naboo`, `Krypton`, `Tatooine`], c: 0 },
       { q: `Quel film remporte l'Oscar du meilleur film en 1994 ?`, o: [`Forrest Gump`, `Pulp Fiction`, `Shawshank`, `The Lion King`], c: 0 },
-      { q: `Dans quel film entend-on "Je reviendrai" (I'll be back) ?`, o: [`Predator`, `Terminator`, `Robocop`, `Total Recall`], c: 1 },
+      { q: `Dans quel film entend-on "Je reviendrai" ?`, o: [`Predator`, `Terminator`, `Robocop`, `Total Recall`], c: 1 },
       { q: `Comment s'appelle l'oncle de Simba dans "Le Roi Lion" ?`, o: [`Scar`, `Mufasa`, `Timon`, `Rafiki`], c: 0 },
       { q: `Combien de films dans la trilogie "Le Seigneur des Anneaux" ?`, o: [`2`, `3`, `4`, `5`], c: 1 },
+      { q: `Dans quel film joue Tom Hanks en naufragé sur une île ?`, o: [`Philadelphia`, `Forrest Gump`, `Cast Away`, `Seul au monde`], c: 2 },
+      { q: `Quel réalisateur a fait "Inception" et "The Dark Knight" ?`, o: [`Steven Spielberg`, `Ridley Scott`, `Christopher Nolan`, `David Fincher`], c: 2 },
+      { q: `Qui joue James Bond dans "Casino Royale" de 2006 ?`, o: [`Pierce Brosnan`, `Timothy Dalton`, `Daniel Craig`, `Roger Moore`], c: 2 },
+      { q: `Dans quel film Charlize Theron joue une reine méchante ?`, o: [`Blanche-Neige`, `The Old Guard`, `Atomic Blonde`, `Blanche-Neige et le chasseur`], c: 3 },
+      { q: `Quel est le film le plus rentable de tous les temps ?`, o: [`Avengers`, `Titanic`, `Avatar`, `The Force Awakens`], c: 2 },
+      { q: `Qui réalise "Pulp Fiction" ?`, o: [`Quentin Tarantino`, `Martin Scorsese`, `Coen Brothers`, `Paul Thomas Anderson`], c: 0 },
+      { q: `Dans quel film Keanu Reeves joue Neo ?`, o: [`John Wick`, `Speed`, `The Matrix`, `Point Break`], c: 2 },
+      { q: `Quelle actrice joue dans "Pretty Woman" ?`, o: [`Meg Ryan`, `Julia Roberts`, `Sandra Bullock`, `Demi Moore`], c: 1 },
+      { q: `Quel film met en scène des dinosaures reconstitués ?`, o: [`The Lost World`, `Jurassic Park`, `Dino World`, `Prehistoric Park`], c: 1 },
+      { q: `Dans "Shrek", quelle star prête sa voix à l'âne ?`, o: [`Will Smith`, `Eddie Murphy`, `Chris Rock`, `Martin Lawrence`], c: 1 },
+      { q: `Quel film Disney met en scène une princesse qui se transforme en grenouille ?`, o: [`La Belle et la Bête`, `Cendrillon`, `La Princesse et la Grenouille`, `Rebelle`], c: 2 },
+      { q: `Qui joue le rôle de Joker dans le film éponyme de 2019 ?`, o: [`Heath Ledger`, `Joaquin Phoenix`, `Jack Nicholson`, `Jared Leto`], c: 1 },
+      { q: `Dans quel film Meryl Streep joue Miranda Priestly ?`, o: [`Julie & Julia`, `Le Diable s'habille en Prada`, `Mamma Mia`, `Les Heures`], c: 1 },
+      { q: `Quel film a popularisé la réplique "I'll be back" ?`, o: [`Predator`, `Total Recall`, `Terminator`, `RoboCop`], c: 2 },
+      { q: `Qui joue Katniss dans "Hunger Games" ?`, o: [`Emma Stone`, `Shailene Woodley`, `Jennifer Lawrence`, `Kristen Stewart`], c: 2 },
+      { q: `Dans quel film de Pixar des jouets prennent vie ?`, o: [`Monstres et Cie`, `Toy Story`, `Cars`, `Ratatouille`], c: 1 },
+      { q: `Quel acteur joue dans "Gladiator" le rôle de Maximus ?`, o: [`Brad Pitt`, `Tom Cruise`, `Russell Crowe`, `Hugh Jackman`], c: 2 },
+      { q: `Quel film se déroule sur le Titanic ?`, o: [`The Poseidon Adventure`, `Titanic`, `Deep Impact`, `The Abyss`], c: 1 },
+      { q: `Qui a réalisé "E.T. l'extraterrestre" ?`, o: [`George Lucas`, `Steven Spielberg`, `James Cameron`, `Ron Howard`], c: 1 },
+      { q: `Dans "Fight Club", qui joue Tyler Durden ?`, o: [`Edward Norton`, `Brad Pitt`, `Matt Damon`, `Jude Law`], c: 1 },
+      { q: `Quel réalisateur français a réalisé "Amélie Poulain" ?`, o: [`Luc Besson`, `Claude Lelouch`, `Jean-Pierre Jeunet`, `Jacques Audiard`], c: 2 },
+      { q: `Dans quel film animé un rat devient chef cuisinier ?`, o: [`Ratatouille`, `Brave`, `Coco`, `Up`], c: 0 },
+      { q: `Quel acteur a joué dans "Cast Away" et "Forrest Gump" ?`, o: [`Tom Hanks`, `Tom Cruise`, `Will Smith`, `Denzel Washington`], c: 0 },
+      { q: `Quel film de Christopher Nolan explore les rêves ?`, o: [`Interstellar`, `Inception`, `Tenet`, `Memento`], c: 1 },
+      { q: `Qui joue Black Widow dans les films Marvel ?`, o: [`Scarlett Johansson`, `Brie Larson`, `Elizabeth Olsen`, `Zoe Saldana`], c: 0 },
+      { q: `Dans quel film entend-on "May the Force be with you" ?`, o: [`Star Trek`, `Star Wars`, `Dune`, `The Last Jedi`], c: 1 },
+      { q: `Quel film met en scène un homme qui rétrécit ?`, o: [`Honey I Shrunk the Kids`, `The Incredible Shrinking Man`, `Ant-Man`, `Tous ces films`], c: 0 },
+      { q: `Qui joue Wolverine dans X-Men ?`, o: [`Chris Pratt`, `Hugh Jackman`, `Ryan Reynolds`, `Chris Evans`], c: 1 },
+      { q: `Dans quel pays a été réalisé "Parasite" primé aux Oscars 2020 ?`, o: [`Chine`, `Japon`, `Corée du Sud`, `Taïwan`], c: 2 },
+      { q: `Quel film de Tim Burton met en scène Johnny Depp en coiffeur ?`, o: [`Charlie et la Chocolaterie`, `Edward aux Mains d'Argent`, `Sweeney Todd`, `Dark Shadows`], c: 2 },
+      { q: `Quelle actrice joue dans "Alien" le rôle de Ripley ?`, o: [`Sigourney Weaver`, `Jodie Foster`, `Jamie Lee Curtis`, `Linda Hamilton`], c: 0 },
+      { q: `Dans "Le Silence des Agneaux", Hannibal Lecter est ?`, o: [`Tueur en série`, `Médecin`, `Les deux`, `Détective`], c: 2 },
+      { q: `Quel film de Clint Eastwood a remporté l'Oscar en 2004 ?`, o: [`Gran Torino`, `Mystic River`, `Million Dollar Baby`, `Unforgiven`], c: 2 },
+      { q: `Qui joue Dominic Toretto dans "Fast & Furious" ?`, o: [`Paul Walker`, `Vin Diesel`, `Dwayne Johnson`, `Tyrese Gibson`], c: 1 },
+      { q: `Dans quel pays se déroule "Amélie Poulain" ?`, o: [`Belgique`, `France`, `Suisse`, `Canada`], c: 1 },
+      { q: `Quel film met en scène une baleine bleue nommée Dory ?`, o: [`Nemo`, `Le Monde de Dory`, `Moana`, `Luca`], c: 1 },
+      { q: `Qui joue "Le Parrain" dans le film de Coppola ?`, o: [`Al Pacino`, `Robert De Niro`, `Marlon Brando`, `James Caan`], c: 2 },
+      { q: `Dans quel film Tom Hanks joue un homme bloqué à l'aéroport ?`, o: [`Big`, `Cast Away`, `Le Terminal`, `Joe contre le Volcan`], c: 2 },
+      { q: `Quel réalisateur a fait "The Revenant" ?`, o: [`Ridley Scott`, `Alejandro Iñárritu`, `David Fincher`, `Denis Villeneuve`], c: 1 },
+      { q: `Quel studio a créé les films d'animation Pixar ?`, o: [`DreamWorks`, `Disney`, `Universal`, `Sony`], c: 1 },
     ]
   },
   histoire: {
@@ -770,12 +901,52 @@ const QUIZ_DATA = {
       { q: `Qui était le premier Président des États-Unis ?`, o: [`Abraham Lincoln`, `Thomas Jefferson`, `George Washington`, `Benjamin Franklin`], c: 2 },
       { q: `En quelle année est tombé le mur de Berlin ?`, o: [`1985`, `1987`, `1989`, `1991`], c: 2 },
       { q: `Napoléon Bonaparte était originaire de... ?`, o: [`France continentale`, `Italie`, `Corse`, `Espagne`], c: 2 },
-      { q: `Qui a découvert l'Amérique en 1492 selon la tradition ?`, o: [`Magellan`, `Vasco de Gama`, `Christophe Colomb`, `Amerigo Vespucci`], c: 2 },
+      { q: `Qui a découvert l'Amérique en 1492 ?`, o: [`Magellan`, `Vasco de Gama`, `Christophe Colomb`, `Amerigo Vespucci`], c: 2 },
       { q: `La Seconde Guerre Mondiale s'est terminée en... ?`, o: [`1943`, `1944`, `1945`, `1946`], c: 2 },
       { q: `Quel empire était gouverné par Jules César ?`, o: [`Grec`, `Romain`, `Perse`, `Ottoman`], c: 1 },
       { q: `La Révolution française a commencé en... ?`, o: [`1785`, `1789`, `1793`, `1799`], c: 1 },
       { q: `Quelle reine d'Égypte est célèbre pour sa beauté légendaire ?`, o: [`Néfertiti`, `Cléopâtre`, `Hatchepsout`, `Tiyi`], c: 1 },
       { q: `Dans quel pays a eu lieu la Révolution bolchévique de 1917 ?`, o: [`Allemagne`, `France`, `Russie`, `Autriche`], c: 2 },
+      { q: `Qui a construit la Grande Muraille de Chine ?`, o: [`L'Empereur Qin`, `Gengis Khan`, `Marco Polo`, `L'Impératrice Wu`], c: 0 },
+      { q: `Quand a eu lieu la Première Guerre Mondiale ?`, o: [`1900-1905`, `1914-1918`, `1935-1939`, `1910-1916`], c: 1 },
+      { q: `Qui était Napoléon III ?`, o: [`Fils de Napoléon Ier`, `Neveu de Napoléon Ier`, `Frère de Napoléon Ier`, `Cousin de Napoléon Ier`], c: 1 },
+      { q: `En quelle année a eu lieu la Révolution américaine ?`, o: [`1776`, `1789`, `1812`, `1865`], c: 0 },
+      { q: `Quel pharaon a fait construire la grande pyramide de Gizeh ?`, o: [`Ramsès II`, `Toutankhamon`, `Khéops`, `Akhenaton`], c: 2 },
+      { q: `Qui était Jeanne d'Arc ?`, o: [`Une reine de France`, `Une sainte guerrière`, `Une espionne`, `Une princesse anglaise`], c: 1 },
+      { q: `En quelle année l'homme a-t-il marché sur la Lune pour la première fois ?`, o: [`1965`, `1967`, `1969`, `1971`], c: 2 },
+      { q: `Quel général a vaincu Napoléon à Waterloo ?`, o: [`Wellington`, `Nelson`, `Blücher`, `Wellington et Blücher`], c: 3 },
+      { q: `Quelle est la date de la Déclaration des Droits de l'Homme en France ?`, o: [`1789`, `1793`, `1799`, `1801`], c: 0 },
+      { q: `Qui a inventé l'imprimerie ?`, o: [`Gutenberg`, `Léonard de Vinci`, `Galilée`, `Newton`], c: 0 },
+      { q: `Quelle civilisation a construit le Machu Picchu ?`, o: [`Aztèque`, `Maya`, `Inca`, `Olmèque`], c: 2 },
+      { q: `En quelle année la France a-t-elle aboli l'esclavage définitivement ?`, o: [`1794`, `1832`, `1848`, `1865`], c: 2 },
+      { q: `Qui était Cléopâtre VII ?`, o: [`Reine de Grèce`, `Reine d'Égypte`, `Reine de Rome`, `Reine de Carthage`], c: 1 },
+      { q: `Quel événement a déclenché la Première Guerre Mondiale ?`, o: [`L'invasion de la Pologne`, `L'assassinat de François-Ferdinand`, `La révolution russe`, `La chute de l'empire ottoman`], c: 1 },
+      { q: `En quelle année Charles de Gaulle est-il né ?`, o: [`1880`, `1890`, `1900`, `1910`], c: 1 },
+      { q: `Quel pays a envahi la Pologne le 1er septembre 1939 ?`, o: [`Russie`, `Italie`, `Allemagne`, `Japon`], c: 2 },
+      { q: `Qui a écrit "Le Prince" ?`, o: [`Machiavel`, `Voltaire`, `Rousseau`, `Montesquieu`], c: 0 },
+      { q: `En quelle année a été fondée l'ONU ?`, o: [`1943`, `1945`, `1947`, `1950`], c: 1 },
+      { q: `Quel roi de France était surnommé "Le Roi Soleil" ?`, o: [`Louis XIII`, `Louis XIV`, `Louis XV`, `Louis XVI`], c: 1 },
+      { q: `Quelle est la date de l'abolition de la peine de mort en France ?`, o: [`1971`, `1976`, `1981`, `1989`], c: 2 },
+      { q: `Qui était le premier homme dans l'espace ?`, o: [`Neil Armstrong`, `Youri Gagarine`, `Alan Shepard`, `Buzz Aldrin`], c: 1 },
+      { q: `En quelle année a commencé la Guerre de Sécession américaine ?`, o: [`1855`, `1861`, `1865`, `1870`], c: 1 },
+      { q: `Qui a fondé l'empire mongol ?`, o: [`Kubilai Khan`, `Tamerlan`, `Gengis Khan`, `Attila`], c: 2 },
+      { q: `Quelle civilisation a inventé l'écriture cunéiforme ?`, o: [`Égyptienne`, `Sumérienne`, `Phénicienne`, `Assyrienne`], c: 1 },
+      { q: `En quelle année a eu lieu la Nuit de Cristal en Allemagne ?`, o: [`1933`, `1935`, `1938`, `1940`], c: 2 },
+      { q: `Qui était le dernier tsar de Russie ?`, o: [`Nicolas Ier`, `Alexandre III`, `Nicolas II`, `Alexandre II`], c: 2 },
+      { q: `En quelle année a été signé le Traité de Versailles ?`, o: [`1917`, `1918`, `1919`, `1920`], c: 2 },
+      { q: `Qui a construit le Colisée de Rome ?`, o: [`Auguste`, `Vespasien`, `Constantin`, `Hadrien`], c: 1 },
+      { q: `Quel empire a régné sur la Grande-Bretagne avant les Romains ?`, o: [`Celtes`, `Saxons`, `Vikings`, `Normands`], c: 0 },
+      { q: `En quelle année a eu lieu la Révolution culturelle en Chine ?`, o: [`1949`, `1956`, `1966`, `1976`], c: 2 },
+      { q: `Qui était le chef des nazis ?`, o: [`Himmler`, `Goebbels`, `Hitler`, `Goering`], c: 2 },
+      { q: `En quelle année l'Algérie a-t-elle obtenu son indépendance ?`, o: [`1956`, `1958`, `1960`, `1962`], c: 3 },
+      { q: `Quel pays a été le premier à accorder le droit de vote aux femmes ?`, o: [`France`, `USA`, `Nouvelle-Zélande`, `Grande-Bretagne`], c: 2 },
+      { q: `Qui a construit l'Alhambra en Espagne ?`, o: [`Les Romains`, `Les Wisigoths`, `Les Maures`, `Les Chrétiens`], c: 2 },
+      { q: `En quelle année a commencé la Guerre de Corée ?`, o: [`1948`, `1950`, `1953`, `1955`], c: 1 },
+      { q: `Quel peuple a envahi Rome au Ve siècle ?`, o: [`Huns`, `Goths`, `Vandales`, `Mongols`], c: 1 },
+      { q: `Qui a régné le plus longtemps en France ?`, o: [`Charlemagne`, `Louis XIV`, `Napoléon`, `François Ier`], c: 1 },
+      { q: `En quelle année a eu lieu la chute de Constantinople ?`, o: [`1353`, `1453`, `1553`, `1653`], c: 1 },
+      { q: `Quel pays a colonisé le Vietnam ?`, o: [`Angleterre`, `France`, `Portugal`, `Espagne`], c: 1 },
+      { q: `Qui était le premier ministre britannique pendant la Seconde Guerre Mondiale ?`, o: [`Chamberlain`, `Churchill`, `Eden`, `Atlee`], c: 1 },
     ]
   },
   geographie: {
@@ -793,6 +964,46 @@ const QUIZ_DATA = {
       { q: `Quelle est la capitale du Brésil ?`, o: [`São Paulo`, `Rio de Janeiro`, `Brasilia`, `Salvador`], c: 2 },
       { q: `Dans quel pays se trouve le mont Kilimandjaro ?`, o: [`Kenya`, `Tanzanie`, `Éthiopie`, `Ouganda`], c: 1 },
       { q: `Quel fleuve traverse Paris ?`, o: [`Loire`, `Rhône`, `Seine`, `Garonne`], c: 2 },
+      { q: `Quelle est la plus haute montagne du monde ?`, o: [`K2`, `Mont Blanc`, `Everest`, `Kangchenjunga`], c: 2 },
+      { q: `Dans quelle mer se trouve la Corse ?`, o: [`Mer du Nord`, `Atlantique`, `Méditerranée`, `Adriatique`], c: 2 },
+      { q: `Quelle est la capitale du Japon ?`, o: [`Osaka`, `Kyoto`, `Tokyo`, `Hiroshima`], c: 2 },
+      { q: `Quel pays est traversé par le Nil ?`, o: [`Maroc`, `Égypte`, `Algérie`, `Libye`], c: 1 },
+      { q: `Dans quel continent se trouve le Sahara ?`, o: [`Asie`, `Afrique`, `Amérique du Sud`, `Océanie`], c: 1 },
+      { q: `Quelle est la capitale de l'Espagne ?`, o: [`Barcelone`, `Séville`, `Valence`, `Madrid`], c: 3 },
+      { q: `Quel est le plus long fleuve du monde ?`, o: [`Amazone`, `Mississippi`, `Nil`, `Yangtsé`], c: 2 },
+      { q: `Dans quelle ville se trouve la Tour Eiffel ?`, o: [`Lyon`, `Marseille`, `Paris`, `Bordeaux`], c: 2 },
+      { q: `Quel pays est connu sous le nom de "Pays du Soleil Levant" ?`, o: [`Chine`, `Corée`, `Japon`, `Vietnam`], c: 2 },
+      { q: `Quelle mer sépare l'Europe de l'Afrique du Nord ?`, o: [`Mer du Nord`, `Mer Noire`, `Méditerranée`, `Mer Rouge`], c: 2 },
+      { q: `Quelle est la capitale de l'Inde ?`, o: [`Mumbai`, `Kolkata`, `Chennai`, `New Delhi`], c: 3 },
+      { q: `Dans quel pays se trouve Angkor Vat ?`, o: [`Thaïlande`, `Vietnam`, `Cambodge`, `Laos`], c: 2 },
+      { q: `Quel détroit sépare l'Espagne de l'Afrique ?`, o: [`Détroit de Messine`, `Détroit de Gibraltar`, `Détroit de Magellan`, `Détroit de Bering`], c: 1 },
+      { q: `Quelle est la capitale de la Nouvelle-Zélande ?`, o: [`Auckland`, `Christchurch`, `Wellington`, `Hamilton`], c: 2 },
+      { q: `Dans quel pays se trouve la Terre de Feu ?`, o: [`Chili et Argentine`, `Brésil`, `Colombie`, `Venezuela`], c: 0 },
+      { q: `Quel est le désert le plus froid du monde ?`, o: [`Sahara`, `Gobi`, `Atacama`, `Antarctique`], c: 3 },
+      { q: `Quelle est la capitale du Canada ?`, o: [`Toronto`, `Vancouver`, `Montréal`, `Ottawa`], c: 3 },
+      { q: `Dans quel pays se trouve le lac Baikal ?`, o: [`Chine`, `Kazakhstan`, `Russie`, `Mongolie`], c: 2 },
+      { q: `Quel pays possède le plus de côtes ?`, o: [`USA`, `Canada`, `Australie`, `Russie`], c: 1 },
+      { q: `Quelle est la capitale de la Grèce ?`, o: [`Thessalonique`, `Héraklion`, `Athènes`, `Patras`], c: 2 },
+      { q: `Dans quelle région française se trouve Bordeaux ?`, o: [`Bretagne`, `Normandie`, `Occitanie`, `Nouvelle-Aquitaine`], c: 3 },
+      { q: `Quel pays d'Amérique du Sud est le seul à parler portugais ?`, o: [`Argentine`, `Chili`, `Uruguay`, `Brésil`], c: 3 },
+      { q: `Quelle est la capitale de la Turquie ?`, o: [`Istanbul`, `Izmir`, `Bursa`, `Ankara`], c: 3 },
+      { q: `Dans quel pays se trouve le fjord de Geiranger ?`, o: [`Islande`, `Danemark`, `Norvège`, `Finlande`], c: 2 },
+      { q: `Quelle est la longueur approximative de l'équateur ?`, o: [`30 000 km`, `40 000 km`, `50 000 km`, `45 000 km`], c: 1 },
+      { q: `Dans quel pays se trouve la forêt amazonienne principalement ?`, o: [`Colombie`, `Venezuela`, `Pérou`, `Brésil`], c: 3 },
+      { q: `Quelle mer intérieure est la plus salée du monde ?`, o: [`Mer Caspienne`, `Mer Morte`, `Mer Rouge`, `Mer d'Aral`], c: 1 },
+      { q: `Quelle est la capitale de l'Égypte ?`, o: [`Alexandrie`, `Le Caire`, `Louxor`, `Assouan`], c: 1 },
+      { q: `Dans quel pays se trouve Zanzibar ?`, o: [`Kenya`, `Mozambique`, `Tanzanie`, `Madagascar`], c: 2 },
+      { q: `Quel pays a la plus grande population au monde en 2024 ?`, o: [`Chine`, `USA`, `Inde`, `Indonésie`], c: 2 },
+      { q: `Dans quelle ville se trouve le Colisée ?`, o: [`Naples`, `Florence`, `Venise`, `Rome`], c: 3 },
+      { q: `Quelle est la plus grande île du monde ?`, o: [`Bornéo`, `Madagascar`, `Nouvelle-Guinée`, `Groenland`], c: 3 },
+      { q: `Dans quel pays se trouve le Parthénon ?`, o: [`Italie`, `Turquie`, `Grèce`, `Croatie`], c: 2 },
+      { q: `Quelle est la capitale de l'Argentine ?`, o: [`Santiago`, `Lima`, `Buenos Aires`, `Montevideo`], c: 2 },
+      { q: `Dans quel pays se trouve le mont Fuji ?`, o: [`Chine`, `Corée`, `Japon`, `Taïwan`], c: 2 },
+      { q: `Quel pays est le plus peuplé d'Afrique ?`, o: [`Éthiopie`, `RDC`, `Nigeria`, `Égypte`], c: 2 },
+      { q: `Quelle est la capitale des Pays-Bas ?`, o: [`Rotterdam`, `Amsterdam`, `La Haye`, `Utrecht`], c: 1 },
+      { q: `Dans quel pays se trouve Machu Picchu ?`, o: [`Bolivie`, `Équateur`, `Pérou`, `Colombie`], c: 2 },
+      { q: `Quel est le plus grand lac d'Afrique ?`, o: [`Lac Tanganyika`, `Lac Victoria`, `Lac Malawi`, `Lac Tchad`], c: 1 },
+      { q: `Dans quelle ville se trouve le musée du Prado ?`, o: [`Barcelone`, `Séville`, `Valence`, `Madrid`], c: 3 },
     ]
   },
   science: {
@@ -802,14 +1013,54 @@ const QUIZ_DATA = {
     questions: [
       { q: `Quelle est la formule chimique de l'eau ?`, o: [`HO2`, `H2O2`, `H2O`, `OH`], c: 2 },
       { q: `Combien de planètes dans le système solaire ?`, o: [`7`, `8`, `9`, `10`], c: 1 },
-      { q: `Qui a formulé la loi de la gravité (légende de la pomme) ?`, o: [`Einstein`, `Newton`, `Darwin`, `Galilée`], c: 1 },
+      { q: `Qui a formulé la loi de la gravité ?`, o: [`Einstein`, `Newton`, `Darwin`, `Galilée`], c: 1 },
       { q: `Quel gaz les plantes absorbent-elles pour la photosynthèse ?`, o: [`Oxygène`, `Azote`, `CO2`, `Hydrogène`], c: 2 },
       { q: `Combien de chromosomes a l'être humain ?`, o: [`23`, `44`, `46`, `48`], c: 2 },
       { q: `Quel est l'élément le plus léger du tableau périodique ?`, o: [`Hélium`, `Hydrogène`, `Lithium`, `Oxygène`], c: 1 },
       { q: `Quelle planète est la plus proche du Soleil ?`, o: [`Vénus`, `Mercure`, `Mars`, `Terre`], c: 1 },
       { q: `À quelle température l'eau bout-elle au niveau de la mer ?`, o: [`90°C`, `95°C`, `100°C`, `105°C`], c: 2 },
-      { q: `Qui a développé la théorie de l'évolution des espèces ?`, o: [`Pasteur`, `Darwin`, `Mendel`, `Lamarck`], c: 1 },
+      { q: `Qui a développé la théorie de l'évolution ?`, o: [`Pasteur`, `Darwin`, `Mendel`, `Lamarck`], c: 1 },
       { q: `Combien d'os compte le corps humain adulte ?`, o: [`186`, `206`, `226`, `246`], c: 1 },
+      { q: `Quel est le plus grand organe du corps humain ?`, o: [`Foie`, `Cerveau`, `Cœur`, `Peau`], c: 3 },
+      { q: `Quelle est la vitesse de la lumière ?`, o: [`150 000 km/s`, `200 000 km/s`, `300 000 km/s`, `400 000 km/s`], c: 2 },
+      { q: `Quel scientifique a découvert la pénicilline ?`, o: [`Louis Pasteur`, `Alexander Fleming`, `Robert Koch`, `Joseph Lister`], c: 1 },
+      { q: `Combien de neurones a le cerveau humain environ ?`, o: [`100 millions`, `1 milliard`, `86 milliards`, `1 trillion`], c: 2 },
+      { q: `Quelle est la formule chimique du sel de table ?`, o: [`NaCl`, `KCl`, `CaCl2`, `MgCl2`], c: 0 },
+      { q: `Quel est l'atome le plus abondant dans l'univers ?`, o: [`Hélium`, `Oxygène`, `Carbone`, `Hydrogène`], c: 3 },
+      { q: `Combien de vertèbres compte la colonne vertébrale humaine ?`, o: [`24`, `33`, `40`, `45`], c: 1 },
+      { q: `Quel gaz est le principal composant de l'atmosphère terrestre ?`, o: [`Oxygène`, `CO2`, `Argon`, `Azote`], c: 3 },
+      { q: `Qui a inventé le téléphone ?`, o: [`Edison`, `Tesla`, `Bell`, `Marconi`], c: 2 },
+      { q: `Quelle est la distance Terre-Lune en km ?`, o: [`284 000`, `384 000`, `484 000`, `584 000`], c: 1 },
+      { q: `Quel est le symbole chimique de l'or ?`, o: [`Or`, `Au`, `Ag`, `Go`], c: 1 },
+      { q: `Combien de dents a un adulte avec les dents de sagesse ?`, o: [`28`, `30`, `32`, `34`], c: 2 },
+      { q: `Quelle est la particule à charge positive dans un atome ?`, o: [`Électron`, `Proton`, `Neutron`, `Photon`], c: 1 },
+      { q: `Quel organe produit l'insuline ?`, o: [`Foie`, `Rein`, `Pancréas`, `Rate`], c: 2 },
+      { q: `Quelle est la planète la plus grande du système solaire ?`, o: [`Saturne`, `Neptune`, `Uranus`, `Jupiter`], c: 3 },
+      { q: `Combien de paires de chromosomes sexuels chez l'humain ?`, o: [`1`, `2`, `3`, `23`], c: 0 },
+      { q: `Quel est le point de fusion du fer ?`, o: [`1085°C`, `1280°C`, `1538°C`, `1800°C`], c: 2 },
+      { q: `Qui a théorisé la relativité générale ?`, o: [`Newton`, `Maxwell`, `Einstein`, `Bohr`], c: 2 },
+      { q: `Quelle est la plus petite planète du système solaire ?`, o: [`Mars`, `Mercure`, `Pluton`, `Vénus`], c: 1 },
+      { q: `Combien de litres de sang a le corps humain ?`, o: [`3-4L`, `5-6L`, `7-8L`, `9-10L`], c: 1 },
+      { q: `Quel est le gaz produit par la respiration humaine ?`, o: [`Oxygène`, `Monoxyde de carbone`, `CO2`, `Azote`], c: 2 },
+      { q: `Quelle planète est entourée d'anneaux visibles ?`, o: [`Jupiter`, `Uranus`, `Neptune`, `Saturne`], c: 3 },
+      { q: `Combien de types de cellules sanguines existent principalement ?`, o: [`2`, `3`, `4`, `5`], c: 1 },
+      { q: `Quel est le symbole chimique du fer ?`, o: [`Fr`, `Fe`, `Fi`, `Fw`], c: 1 },
+      { q: `À quelle vitesse se propage le son dans l'air ?`, o: [`340 m/s`, `500 m/s`, `1000 m/s`, `150 m/s`], c: 0 },
+      { q: `Qui a découvert les rayons X ?`, o: [`Curie`, `Röntgen`, `Becquerel`, `Thomson`], c: 1 },
+      { q: `Combien de chambres a le cœur humain ?`, o: [`2`, `3`, `4`, `5`], c: 2 },
+      { q: `Quelle est la formule du dioxyde de carbone ?`, o: [`CO`, `CO2`, `C2O`, `C2O2`], c: 1 },
+      { q: `Quel est le métal le plus conducteur d'électricité ?`, o: [`Cuivre`, `Aluminium`, `Argent`, `Or`], c: 2 },
+      { q: `Combien d'éléments compte le tableau périodique actuel ?`, o: [`92`, `100`, `118`, `120`], c: 2 },
+      { q: `Quelle est la durée d'un an sur Neptune ?`, o: [`30 ans`, `60 ans`, `100 ans`, `165 ans`], c: 3 },
+      { q: `Qui a découvert la structure de l'ADN ?`, o: [`Watson et Crick`, `Mendel et Darwin`, `Curie et Einstein`, `Fleming et Pasteur`], c: 0 },
+      { q: `Quel est l'organe le plus lourd du corps humain ?`, o: [`Cerveau`, `Cœur`, `Foie`, `Rein`], c: 2 },
+      { q: `Combien de secondes dans une heure ?`, o: [`360`, `3600`, `36000`, `360000`], c: 1 },
+      { q: `Quelle est la température du Soleil en surface ?`, o: [`1000°C`, `5500°C`, `10000°C`, `50000°C`], c: 1 },
+      { q: `Qui a inventé la radioactivité ?`, o: [`Einstein`, `Curie`, `Becquerel`, `Fermi`], c: 2 },
+      { q: `Quel est le plus petit os du corps humain ?`, o: [`Péroné`, `Étrier`, `Cubitus`, `Phalange`], c: 1 },
+      { q: `Quelle est la formule de l'acide sulfurique ?`, o: [`HCl`, `H2SO4`, `H3PO4`, `HNO3`], c: 1 },
+      { q: `Combien de phases de sommeil y a-t-il ?`, o: [`2`, `3`, `4`, `5`], c: 2 },
+      { q: `Quel planète tourne "sur le côté" dans le système solaire ?`, o: [`Neptune`, `Saturne`, `Uranus`, `Jupiter`], c: 2 },
     ]
   },
   cuisine: {
@@ -827,6 +1078,46 @@ const QUIZ_DATA = {
       { q: `De quel pays vient la paella ?`, o: [`Portugal`, `Italie`, `Mexique`, `Espagne`], c: 3 },
       { q: `Quelle est la base d'une sauce béchamel ?`, o: [`Crème fraîche`, `Beurre+farine+lait`, `Tomate`, `Huile d'olive`], c: 1 },
       { q: `Le camembert est fabriqué à partir de lait de... ?`, o: [`Chèvre`, `Vache`, `Brebis`, `Bufflonne`], c: 1 },
+      { q: `Quelle pâte est à la base des macarons ?`, o: [`Pâte sablée`, `Pâte feuilletée`, `Pâte à choux`, `Pâte d'amande`], c: 3 },
+      { q: `De quel pays vient le kimchi ?`, o: [`Chine`, `Japon`, `Corée`, `Vietnam`], c: 2 },
+      { q: `Quel est l'ingrédient principal de la bouillabaisse ?`, o: [`Viande`, `Poisson`, `Légumes`, `Œufs`], c: 1 },
+      { q: `Quelle ville française est réputée pour ses quenelles ?`, o: [`Paris`, `Lyon`, `Marseille`, `Bordeaux`], c: 1 },
+      { q: `De quelle plante est extraite la vanille ?`, o: [`Rose`, `Orchidée`, `Jasmin`, `Ylang-ylang`], c: 1 },
+      { q: `Quel est l'ingrédient principal de la ratatouille ?`, o: [`Courgettes`, `Tomates`, `Les deux`, `Aubergines`], c: 2 },
+      { q: `Quelle épice est la plus chère au monde ?`, o: [`Vanille`, `Safran`, `Cardamome`, `Truffe`], c: 1 },
+      { q: `De quel pays vient le strudel ?`, o: [`Allemagne`, `Autriche`, `Hongrie`, `Suisse`], c: 1 },
+      { q: `Quel fromage est utilisé dans la vraie pizza Margherita ?`, o: [`Parmesan`, `Emmental`, `Mozzarella`, `Ricotta`], c: 2 },
+      { q: `Quelle est la base du hummus ?`, o: [`Lentilles`, `Pois chiches`, `Haricots blancs`, `Fèves`], c: 1 },
+      { q: `De quel pays vient le saumon fumé traditionnel ?`, o: [`Danemark`, `Suède`, `Norvège`, `Finlande`], c: 2 },
+      { q: `Quel cocktail contient du champagne et du jus de pêche ?`, o: [`Kir Royal`, `Bellini`, `Mimosa`, `Spritz`], c: 1 },
+      { q: `Quelle huile est utilisée dans la cuisine méditerranéenne ?`, o: [`Huile de tournesol`, `Huile de coco`, `Huile d'olive`, `Huile de sésame`], c: 2 },
+      { q: `De quel pays vient la fondue au fromage ?`, o: [`France`, `Belgique`, `Suisse`, `Italie`], c: 2 },
+      { q: `Quel est l'ingrédient secret de la sauce Worcester ?`, o: [`Anchois`, `Sardines`, `Thon`, `Hareng`], c: 0 },
+      { q: `Quelle est la particularité de la cuisson "al dente" ?`, o: [`Très cuit`, `Légèrement ferme`, `Cru`, `Fondant`], c: 1 },
+      { q: `De quel pays vient le baklava ?`, o: [`Iran`, `Turquie`, `Liban`, `Grèce`], c: 1 },
+      { q: `Quel alcool est utilisé dans les crêpes Suzette ?`, o: [`Calvados`, `Grand Marnier`, `Cognac`, `Armagnac`], c: 1 },
+      { q: `Quelle est la farine utilisée pour les pâtes fraîches italiennes ?`, o: [`Farine T55`, `Semoule fine`, `Farine de blé dur`, `Les deux dernières`], c: 3 },
+      { q: `De quel pays vient le curry ?`, o: [`Thaïlande`, `Inde`, `Malaisie`, `Sri Lanka`], c: 1 },
+      { q: `Quel fruit est à la base de la tarte Tatin ?`, o: [`Poire`, `Pomme`, `Abricot`, `Mirabelle`], c: 1 },
+      { q: `Quelle est la viande traditionnelle du tajine marocain ?`, o: [`Bœuf`, `Porc`, `Agneau`, `Poulet`], c: 2 },
+      { q: `De quel pays vient le croissant au beurre original ?`, o: [`France`, `Autriche`, `Belgique`, `Suisse`], c: 1 },
+      { q: `Quel est l'ingrédient principal de la mousse au chocolat ?`, o: [`Chocolat et sucre`, `Chocolat et œufs`, `Chocolat et crème`, `Chocolat et beurre`], c: 1 },
+      { q: `Quelle épice est extraite des pistils du crocus ?`, o: [`Curcuma`, `Safran`, `Paprika`, `Cumin`], c: 1 },
+      { q: `De quel pays vient le ceviche ?`, o: [`Mexique`, `Brésil`, `Pérou`, `Colombie`], c: 2 },
+      { q: `Quel fromage entre dans la composition du croque-monsieur ?`, o: [`Comté`, `Gruyère`, `Emmental`, `Gouda`], c: 1 },
+      { q: `Quelle herbe aromatique est essentielle dans le pesto ?`, o: [`Persil`, `Coriandre`, `Basilic`, `Menthe`], c: 2 },
+      { q: `De quel pays vient le tzatziki ?`, o: [`Turquie`, `Grèce`, `Liban`, `Israël`], c: 1 },
+      { q: `Quel est l'ingrédient principal du gaspacho ?`, o: [`Poivron`, `Concombre`, `Tomate`, `Courgette`], c: 2 },
+      { q: `Quelle est la particularité du pain de seigle ?`, o: [`Plus léger`, `Plus dense`, `Plus sucré`, `Plus salé`], c: 1 },
+      { q: `De quel pays vient le gelato ?`, o: [`France`, `Espagne`, `Italie`, `Portugal`], c: 2 },
+      { q: `Quel alcool est la base du mojito ?`, o: [`Vodka`, `Gin`, `Rhum`, `Tequila`], c: 2 },
+      { q: `Quelle cuisine est connue pour le "dim sum" ?`, o: [`Japonaise`, `Coréenne`, `Chinoise`, `Vietnamienne`], c: 2 },
+      { q: `Quel légume est indispensable dans la soupe à l'oignon ?`, o: [`Oignon`, `Poireau`, `Échalote`, `Ail`], c: 0 },
+      { q: `De quel pays vient le tempura ?`, o: [`Chine`, `Japon`, `Thaïlande`, `Vietnam`], c: 1 },
+      { q: `Quel est l'ingrédient principal de la brandade ?`, o: [`Morue`, `Sardine`, `Thon`, `Saumon`], c: 0 },
+      { q: `Quelle céréale est à la base du risotto ?`, o: [`Orge`, `Riz Arborio`, `Quinoa`, `Boulgour`], c: 1 },
+      { q: `De quel pays vient la tortilla de patatas ?`, o: [`Mexique`, `Portugal`, `Espagne`, `Italie`], c: 2 },
+      { q: `Quel est l'ingrédient clé de la soupe miso ?`, o: [`Pâte de tofu`, `Pâte de miso`, `Sauce soja`, `Dashi`], c: 1 },
     ]
   },
   culture: {
@@ -837,13 +1128,53 @@ const QUIZ_DATA = {
       { q: `Combien de couleurs compte l'arc-en-ciel ?`, o: [`5`, `6`, `7`, `8`], c: 2 },
       { q: `Qui a peint la Joconde ?`, o: [`Michel-Ange`, `Raphaël`, `Léonard de Vinci`, `Botticelli`], c: 2 },
       { q: `Quel est le plus grand mammifère marin ?`, o: [`Requin baleine`, `Baleine bleue`, `Cachalot`, `Dauphin`], c: 1 },
-      { q: `Quel est le pays le plus peuplé du monde (2024) ?`, o: [`Chine`, `Inde`, `USA`, `Indonésie`], c: 1 },
+      { q: `Quel est le pays le plus peuplé du monde en 2024 ?`, o: [`Chine`, `Inde`, `USA`, `Indonésie`], c: 1 },
       { q: `Dans quelle ville se trouve la Sagrada Familia ?`, o: [`Madrid`, `Lisbonne`, `Barcelone`, `Séville`], c: 2 },
       { q: `Quel auteur a écrit "Les Misérables" ?`, o: [`Balzac`, `Zola`, `Flaubert`, `Victor Hugo`], c: 3 },
       { q: `Combien de faces a un cube ?`, o: [`4`, `5`, `6`, `8`], c: 2 },
       { q: `Quelle est la monnaie du Japon ?`, o: [`Won`, `Yuan`, `Yen`, `Baht`], c: 2 },
       { q: `Combien de lettres compte l'alphabet français ?`, o: [`24`, `25`, `26`, `27`], c: 2 },
       { q: `Quel animal est le symbole de la paix ?`, o: [`Colombe`, `Aigle`, `Cygne`, `Hibou`], c: 0 },
+      { q: `Qui a écrit "1984" ?`, o: [`Aldous Huxley`, `George Orwell`, `Ray Bradbury`, `Arthur C. Clarke`], c: 1 },
+      { q: `Quelle est la couleur du deuil au Japon ?`, o: [`Noir`, `Blanc`, `Bleu`, `Rouge`], c: 1 },
+      { q: `Combien de planètes dans le système solaire ?`, o: [`7`, `8`, `9`, `10`], c: 1 },
+      { q: `Quel peintre est connu pour ses tournesols ?`, o: [`Monet`, `Renoir`, `Van Gogh`, `Gauguin`], c: 2 },
+      { q: `Quelle est la langue la plus parlée au monde ?`, o: [`Anglais`, `Espagnol`, `Mandarin`, `Hindi`], c: 2 },
+      { q: `Qui a écrit "Harry Potter" ?`, o: [`Tolkien`, `C.S. Lewis`, `J.K. Rowling`, `Philip Pullman`], c: 2 },
+      { q: `Quelle est la couleur du rubis ?`, o: [`Bleu`, `Vert`, `Rouge`, `Jaune`], c: 2 },
+      { q: `Combien de continents y a-t-il ?`, o: [`5`, `6`, `7`, `8`], c: 2 },
+      { q: `Quel animal est le plus rapide au monde ?`, o: [`Guépard`, `Faucon pèlerin`, `Antilope`, `Lion`], c: 1 },
+      { q: `Qui a peint "La Nuit étoilée" ?`, o: [`Monet`, `Van Gogh`, `Picasso`, `Dali`], c: 1 },
+      { q: `Quel est le plus long roman du monde ?`, o: [`Guerre et Paix`, `À la recherche du temps perdu`, `Don Quichotte`, `Infinite Jest`], c: 1 },
+      { q: `Combien de dents de lait a un enfant ?`, o: [`16`, `20`, `24`, `28`], c: 1 },
+      { q: `Qui a écrit "Le Petit Prince" ?`, o: [`Jules Verne`, `Victor Hugo`, `Antoine de Saint-Exupéry`, `Albert Camus`], c: 2 },
+      { q: `Quel est le métal le plus rare sur Terre ?`, o: [`Or`, `Platine`, `Iridium`, `Rhodium`], c: 3 },
+      { q: `Combien de membres de l'ONU y a-t-il ?`, o: [`150`, `170`, `193`, `220`], c: 2 },
+      { q: `Qui a peint "Les Demoiselles d'Avignon" ?`, o: [`Braque`, `Matisse`, `Picasso`, `Léger`], c: 2 },
+      { q: `Quelle est la devise de la France ?`, o: [`Liberté, Égalité, Paternité`, `Liberté, Égalité, Fraternité`, `Unité, Liberté, Égalité`, `Paix, Travail, Liberté`], c: 1 },
+      { q: `Combien de cordes a un violon ?`, o: [`3`, `4`, `5`, `6`], c: 1 },
+      { q: `Quel pays a inventé les Jeux Olympiques ?`, o: [`Rome`, `Grèce`, `Égypte`, `Perse`], c: 1 },
+      { q: `Qui a écrit "L'Étranger" ?`, o: [`Sartre`, `Camus`, `Beauvoir`, `Malraux`], c: 1 },
+      { q: `Quel est le symbole chimique de l'or ?`, o: [`Or`, `Ag`, `Au`, `Fe`], c: 2 },
+      { q: `Combien de joueurs dans une équipe de polo ?`, o: [`2`, `3`, `4`, `5`], c: 2 },
+      { q: `Qui a sculpté "Le Penseur" ?`, o: [`Michel-Ange`, `Rodin`, `Brancusi`, `Giacometti`], c: 1 },
+      { q: `Quelle couleur obtient-on en mélangeant rouge et bleu ?`, o: [`Orange`, `Vert`, `Violet`, `Marron`], c: 2 },
+      { q: `Combien de secondes dans un jour ?`, o: [`72 000`, `86 400`, `100 000`, `120 000`], c: 1 },
+      { q: `Quel est le pays avec le plus de langues officielles ?`, o: [`Suisse`, `Inde`, `Belgique`, `Canada`], c: 1 },
+      { q: `Qui a écrit "La Divina Commedia" ?`, o: [`Pétrarque`, `Bocace`, `Dante`, `Virgile`], c: 2 },
+      { q: `Quel est l'animal le plus venimeux du monde ?`, o: [`Cobra`, `Mamba noir`, `Pieuvre à anneaux bleus`, `Méduse boîte`], c: 3 },
+      { q: `Combien de mois a une année lunaire ?`, o: [`10`, `12`, `13`, `14`], c: 1 },
+      { q: `Qui a peint le plafond de la Chapelle Sixtine ?`, o: [`Léonard de Vinci`, `Raphaël`, `Michel-Ange`, `Botticelli`], c: 2 },
+      { q: `Quel est le plus haut bâtiment du monde ?`, o: [`Empire State Building`, `Tour de Pékin`, `Burj Khalifa`, `Merdeka 118`], c: 2 },
+      { q: `Combien de pétales a un trèfle à 4 feuilles ?`, o: [`3`, `4`, `5`, `6`], c: 1 },
+      { q: `Qui a écrit "Don Quichotte" ?`, o: [`Cervantes`, `Lope de Vega`, `Calderon`, `Tirso de Molina`], c: 0 },
+      { q: `Quelle est la plus ancienne université du monde ?`, o: [`Oxford`, `Bologne`, `Al-Qarawiyyin`, `Harvard`], c: 2 },
+      { q: `Quel est le plus grand désert du monde ?`, o: [`Sahara`, `Gobi`, `Atacama`, `Antarctique`], c: 3 },
+      { q: `Combien de sonnets a écrit Shakespeare ?`, o: [`100`, `154`, `200`, `254`], c: 1 },
+      { q: `Qui a inventé l'imprimerie à caractères mobiles en Europe ?`, o: [`Léonard de Vinci`, `Gutenberg`, `Copernic`, `Tycho Brahe`], c: 1 },
+      { q: `Quelle est la capitale de la Mongolie ?`, o: [`Almaty`, `Oulan-Bator`, `Bishkek`, `Astana`], c: 1 },
+      { q: `Combien de mètres mesure la Grande Muraille de Chine ?`, o: [`6 000 km`, `13 000 km`, `21 000 km`, `30 000 km`], c: 2 },
+      { q: `Qui a écrit "Crime et Châtiment" ?`, o: [`Tolstoï`, `Dostoïevski`, `Tchekhov`, `Tourgueniev`], c: 1 },
     ]
   },
 };
@@ -1160,6 +1491,9 @@ function restorePlayerState() {
 }
 
 function goToRouePlayer() {
+  isSpinning = false;
+  const btn = document.getElementById('player-spin-btn');
+  if (btn) { btn.disabled = false; btn.onclick = playerSpin; }
   drawWheel('player-canvas', getPlayerWheelSize(), 0);
   renderLegende();
   goPlayerScreen('ps-roue');
@@ -1302,6 +1636,8 @@ function onSpinEnd(target, joueurKey) {
   drawWheel('proj-canvas', getWheelSize(), wheelAngle);
   drawWheel('player-canvas', getPlayerWheelSize(), wheelAngle);
   isSpinning = false;
+  const psbtn = document.getElementById('player-spin-btn');
+  if (psbtn) psbtn.disabled = false;
   sfxWin();
   const lot = LOTS[target];
   // Stock décrémenté en backoffice uniquement
@@ -1382,6 +1718,11 @@ function fmtHeure(ts) {
   const d = new Date(ts);
   return d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
 }
+function passToRoue(key) {
+  if (db) db.ref(`${FB_PATH}/joueurs/${key}`).update({status:'valide'});
+  else { if(joueurs[key]) { joueurs[key].status='valide'; renderJoueurs(); } }
+  setTimeout(() => selectJoueur(key), 400);
+}
 function deleteJoueur(key) {
   if (db) db.ref(`${FB_PATH}/joueurs/${key}`).remove();
   else { delete joueurs[key]; renderJoueurs(); updateStats(); }
@@ -1423,7 +1764,10 @@ function renderJoueurs() {
           <div class="j-co">${esc(j.co||'')}</div>
           ${badgeMap[j.status||'inscrit']||''}
         </div>
-        <button onclick="event.stopPropagation();deleteJoueur('${key}')" style="background:transparent;border:none;color:rgba(255,68,68,.45);font-size:1rem;cursor:pointer;padding:2px 5px;flex-shrink:0;line-height:1;" title="Supprimer">×</button>
+        <div style="display:flex;flex-direction:column;gap:3px;flex-shrink:0;">
+          <button onclick="event.stopPropagation();passToRoue('${key}')" style="background:transparent;border:1px solid rgba(184,255,60,.3);border-radius:4px;color:rgba(184,255,60,.75);font-size:.75rem;cursor:pointer;padding:2px 5px;line-height:1.2;" title="Passer à la roue">🎡</button>
+          <button onclick="event.stopPropagation();deleteJoueur('${key}')" style="background:transparent;border:none;color:rgba(255,68,68,.45);font-size:1rem;cursor:pointer;padding:2px 5px;line-height:1;" title="Supprimer">×</button>
+        </div>
       </div>
     `;
     c.appendChild(div);
@@ -1559,6 +1903,7 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 
 // ── FULLSCREEN (touche F)
 document.addEventListener('keydown', e => {
+  if ((e.key === ' ' || e.key === 'Spacebar') && document.getElementById('ov-result')?.classList.contains('show')) { e.preventDefault(); closeOverlay(); return; }
   if (e.key === 'f' || e.key === 'F') {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
@@ -1590,7 +1935,37 @@ function sfxTick()    { playTone(600 + Math.random()*200, 'square', 0.04, 0.1); 
 function sfxCorrect() { [523,659,784,1047].forEach((f,i) => playTone(f,'triangle',0.25,0.25,i*0.07)); }
 function sfxWrong()   { [220,180].forEach((f,i) => playTone(f,'sawtooth',0.3,0.3,i*0.08)); }
 function sfxSpin()    { playTone(440+Math.random()*300,'square',0.035,0.08); }
-function sfxWin()     { [523,659,784,880,1047,1319].forEach((f,i) => playTone(f,'triangle',0.4,0.3,i*0.08)); }
+function sfxWin() {
+  try {
+    const ac = getAC();
+    const m = [
+      [523,.12],[659,.12],[784,.12],[1047,.25],[988,.12],[880,.12],[784,.25],
+      [659,.12],[784,.12],[988,.12],[1175,.25],[1047,.12],[988,.12],[880,.25],
+      [784,.12],[880,.12],[988,.12],[1175,.12],[1319,.4],
+      [1047,.12],[1175,.12],[1319,.12],[1568,.5],
+      [1319,.12],[1175,.12],[1047,.12],[988,.12],[880,.25],
+      [784,.12],[659,.12],[523,.12],[440,.12],[523,.5],
+      [659,.12],[784,.12],[880,.12],[988,.12],[1047,.4],
+      [523,.07],[659,.07],[784,.07],[880,.07],[988,.07],[1047,.07],[1175,.07],[1319,.07],[1568,.7]
+    ];
+    let t = ac.currentTime + 0.05;
+    m.forEach(([freq,dur]) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.type = 'triangle'; o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0.25, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.9);
+      o.start(t); o.stop(t + dur);
+      const o2 = ac.createOscillator(), g2 = ac.createGain();
+      o2.connect(g2); g2.connect(ac.destination);
+      o2.type = 'sine'; o2.frequency.setValueAtTime(freq/2, t);
+      g2.gain.setValueAtTime(0.08, t);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.9);
+      o2.start(t); o2.stop(t + dur);
+      t += dur;
+    });
+  } catch(e) {}
+}
 function sfxButton()  { playTone(800,'sine',0.08,0.15); }
 function sfxTimeout() { [300,250].forEach((f,i) => playTone(f,'square',0.2,0.2,i*0.1)); }
 
