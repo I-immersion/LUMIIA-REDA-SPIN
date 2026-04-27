@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v3.2 -->
+<!-- LUMIIA REDA SPIN — v3.3 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -468,7 +468,7 @@ html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito
 <!-- TOPBAR -->
 <div id="topbar" id="topbar-proj">
   <div class="tb-logo">LUMIIA SPIN</div>
-  <div class="tb-v">v3.2</div>
+  <div class="tb-v">v3.3</div>
   <div id="fb-indicator" title="Firebase" style="
     display:flex;align-items:center;gap:5px;padding:0 10px;
     border-right:1px solid var(--bd);font-size:.62rem;color:var(--dim);
@@ -1495,9 +1495,11 @@ function restorePlayerState() {
 }
 
 function goToRouePlayer() {
-  isSpinning = false;
   const btn = document.getElementById('player-spin-btn');
-  if (btn) { btn.disabled = false; btn.onclick = playerSpin; }
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = '🎡 TOURNER LA ROUE !';
+  }
   drawWheel('player-canvas', getPlayerWheelSize(), 0);
   renderLegende();
   goPlayerScreen('ps-roue');
@@ -1599,13 +1601,58 @@ function spinProj() {
 }
 
 function playerSpin() {
-  if (isSpinning) return;
-  document.getElementById('player-spin-btn').disabled = true;
+  const btn = document.getElementById('player-spin-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ La roue tourne...'; }
+
+  const canvas = document.getElementById('player-canvas');
+  if (!canvas) { console.warn('No player-canvas'); return; }
+
+  // Calculer la taille au moment du clic (viewport réel)
+  const size = Math.min(
+    (window.innerWidth || 390) - 40,
+    Math.floor((window.innerHeight || 667) * 0.42),
+    280
+  );
+  canvas.width = canvas.height = size;
+
   const target = Math.floor(Math.random() * LOTS.length);
-  // Animer localement immédiatement (pas de round-trip Firebase)
-  animateSpin(target, myKey);
+  const seg = (2 * Math.PI) / LOTS.length;
+  const stopAngle = -Math.PI / 2 - (target * seg + seg / 2);
+  const totalRot = stopAngle + (9 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+  const dur = 9000;
+  const t0 = performance.now();
+
+  function drawFrame(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3.8);
+    const angle = (eased * totalRot) % (2 * Math.PI);
+    drawWheel('player-canvas', size, angle);
+    if (p < 1) {
+      requestAnimationFrame(drawFrame);
+    } else {
+      playerSpinDone(target);
+    }
+  }
+  requestAnimationFrame(drawFrame);
+
   // Sync Firebase pour la projection
   if (db && myKey) db.ref(`${FB_PATH}/spin`).set({ result: target, joueurKey: myKey, ts: Date.now() });
+}
+
+function playerSpinDone(target) {
+  sfxWin();
+  const lot = LOTS[target];
+  if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'gagne', lot });
+  // Afficher le lot sur l'écran joueur
+  const msgEl  = document.getElementById('attente-msg');
+  const subEl  = document.getElementById('attente-sub');
+  const boxEl  = document.getElementById('attente-lot-box');
+  const nameEl = document.getElementById('attente-lot-name');
+  if (msgEl)  { msgEl.textContent = '🎉 Félicitations !'; msgEl.style.color = 'var(--lime)'; }
+  if (subEl)  { subEl.style.display = 'none'; }
+  if (boxEl)  { boxEl.style.display = 'block'; }
+  if (nameEl) { nameEl.textContent = lot; }
+  goPlayerScreen('ps-attente');
 }
 
 function animateSpin(target, joueurKey) {
