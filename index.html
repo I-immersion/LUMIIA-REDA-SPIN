@@ -1,1247 +1,1359 @@
 <!DOCTYPE html>
-<!-- LUMIIA REDA SPIN — v1.0 — Avril 2026 -->
+<!-- LUMIIA REDA SPIN — v2.0 -->
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LUMIIA SPIN</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>LUMIIA REDA SPIN</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
-/* ════════════════════════════════════════════════
-   RESET & VARIABLES
-════════════════════════════════════════════════ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 :root{
-  --cosmos:     #0b0520;
-  --deep:       #05001a;
-  --panel:      #140932;
-  --surface:    rgba(255,255,255,0.06);
-  --surface2:   rgba(255,255,255,0.10);
-  --border:     rgba(255,255,255,0.1);
-  --texte:      #f0e8f8;
-  --soft:       #c9c2e8;
-  --dim:        rgba(201,194,232,0.45);
-  --cyan:       #4dd9e8;
-  --magenta:    #d946ef;
-  --violet:     #a855f7;
-  --lime:       #b8ff3c;
-  --or:         #ffd700;
-  --danger:     #ff4444;
-  --success:    #4ade80;
+  --cosmos:#0b0520;--deep:#05001a;--panel:#140932;
+  --cyan:#4dd9e8;--mag:#d946ef;--violet:#a855f7;--lime:#b8ff3c;--or:#ffd700;
+  --danger:#ff4444;--ok:#4ade80;
+  --tx:#f0e8f8;--soft:#c9c2e8;--dim:rgba(201,194,232,.45);
+  --bd:rgba(255,255,255,.09);
 }
-html,body{height:100%;overflow:hidden;background:var(--cosmos);color:var(--texte);font-family:'Nunito',sans-serif;}
+html,body{height:100%;background:var(--deep);color:var(--tx);font-family:'Nunito',sans-serif;overflow:hidden;}
 
-/* ════════════════════════════════════════════════
-   TOPBAR GLOBALE (onglets)
-════════════════════════════════════════════════ */
-#g-topbar{
-  height:52px;flex-shrink:0;
-  display:flex;align-items:center;gap:0;
-  background:rgba(5,0,26,.9);
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(10px);
-  position:fixed;top:0;left:0;right:0;z-index:2000;
+/* ── BANDEAU PERMANENT ── */
+#bandeau{
+  height:40px;flex-shrink:0;
+  background:linear-gradient(90deg,rgba(77,217,232,.12),rgba(168,85,247,.12));
+  border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;position:fixed;top:0;left:0;right:0;z-index:300;
 }
-.g-logo{
-  display:flex;align-items:center;gap:8px;
-  padding:0 18px;
-  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.35em;
-  color:rgba(255,255,255,.4);white-space:nowrap;border-right:1px solid var(--border);
+#bandeau-left{
+  font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.18em;
+  background:linear-gradient(90deg,var(--cyan),var(--mag));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.g-logo span{background:linear-gradient(135deg,var(--cyan),var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.g-tabs{display:flex;height:100%;}
-.g-tab{
-  padding:0 22px;border:none;background:transparent;
-  color:var(--dim);font-family:'Bebas Neue',sans-serif;
-  font-size:.85rem;letter-spacing:.15em;cursor:pointer;
-  border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;
-}
-.g-tab:hover{color:var(--texte);}
-.g-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
-.g-spacer{flex:1;}
-.g-right{display:flex;align-items:center;gap:8px;padding:0 14px;}
-.g-btn{
-  padding:6px 14px;border:1px solid var(--border);border-radius:8px;
-  background:transparent;color:var(--dim);font-size:.72rem;letter-spacing:.08em;
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-}
-.g-btn:hover{border-color:var(--cyan);color:var(--cyan);}
-.g-btn.danger{border-color:rgba(255,68,68,.3);color:rgba(255,68,68,.6);}
-.g-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
-#version-badge{font-size:.5rem;letter-spacing:.12em;color:rgba(255,255,255,.2);font-family:monospace;}
+#bandeau-right{font-size:.7rem;color:var(--dim);letter-spacing:.08em;}
+#bandeau-right a{color:var(--cyan);text-decoration:none;}
 
-/* ════════════════════════════════════════════════
-   VUES
-════════════════════════════════════════════════ */
-.view{display:none;position:fixed;top:52px;left:0;right:0;bottom:0;}
+/* ── TOPBAR ── */
+#topbar{
+  height:46px;background:rgba(5,0,26,.95);border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;
+  position:fixed;top:40px;left:0;right:0;z-index:200;
+}
+.tb-logo{
+  padding:0 14px;font-family:'Bebas Neue',sans-serif;font-size:.8rem;
+  letter-spacing:.2em;color:rgba(255,255,255,.3);border-right:1px solid var(--bd);
+  white-space:nowrap;
+}
+.tb-v{font-size:.45rem;color:rgba(255,255,255,.18);font-family:monospace;padding:0 8px;border-right:1px solid var(--bd);}
+.tb-tabs{display:flex;height:100%;}
+.tb-tab{
+  padding:0 18px;border:none;background:transparent;color:var(--dim);
+  font-family:'Bebas Neue',sans-serif;font-size:.78rem;letter-spacing:.1em;
+  cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;
+}
+.tb-tab.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.tb-sp{flex:1;}
+.tb-right{display:flex;align-items:center;gap:6px;padding:0 12px;}
+.tb-btn{
+  padding:5px 11px;border:1px solid var(--bd);border-radius:7px;
+  background:transparent;color:var(--dim);font-size:.68rem;cursor:pointer;transition:all .2s;
+}
+.tb-btn:hover{border-color:var(--cyan);color:var(--cyan);}
+.tb-btn.danger{border-color:rgba(255,68,68,.25);color:rgba(255,68,68,.5);}
+.tb-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ── VUES ── */
+.view{display:none;position:fixed;top:86px;left:0;right:0;bottom:0;}
 .view.active{display:flex;}
 
-/* ════════════════════════════════════════════════
-   VUE PROJECTION (3 colonnes 1080p)
-════════════════════════════════════════════════ */
-#view-proj{
-  flex-direction:column;background:var(--deep);
-}
-#proj-main{
-  flex:1;display:grid;
-  grid-template-columns:280px 1fr 320px;
-  overflow:hidden;min-height:0;
+/* ══════════════════════════════════
+   PROJECTION
+══════════════════════════════════ */
+#view-proj{background:var(--deep);}
+#proj-grid{
+  width:100%;height:100%;
+  display:grid;grid-template-columns:270px 1fr 300px;overflow:hidden;
 }
 
-/* ── Colonne gauche joueurs ── */
-#proj-left{
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;overflow:hidden;
-}
-.col-head{
-  padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0;
+/* Gauche */
+#col-left{border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden;}
+.col-hd{
+  padding:10px 14px;border-bottom:1px solid var(--bd);flex-shrink:0;
   display:flex;align-items:center;justify-content:space-between;
 }
-.col-head-label{font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:.1em;color:var(--dim);}
-.col-head-count{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--cyan);}
-#joueurs-list{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:5px;}
-#joueurs-list::-webkit-scrollbar{width:3px;}
-#joueurs-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:2px;}
-.j-card{
-  padding:9px 12px;border-radius:10px;
-  background:var(--surface);border:1px solid var(--border);
-  display:flex;align-items:center;gap:9px;
-  transition:all .25s;
+.col-hd-lbl{font-family:'Bebas Neue',sans-serif;font-size:.78rem;letter-spacing:.1em;color:var(--dim);}
+.col-hd-val{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--cyan);}
+#j-list{flex:1;overflow-y:auto;padding:6px;display:flex;flex-direction:column;gap:4px;}
+#j-list::-webkit-scrollbar{width:3px;}
+#j-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:2px;}
+.j-row{
+  padding:9px 11px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--bd);
+  cursor:pointer;transition:all .2s;
 }
-.j-card.active{
-  background:rgba(184,255,60,.1);border-color:var(--lime);
-  box-shadow:0 0 16px rgba(184,255,60,.2);
-  animation:card-glow 1.5s ease-in-out infinite;
+.j-row:hover{border-color:rgba(77,217,232,.3);background:rgba(77,217,232,.05);}
+.j-row.selected{border-color:var(--lime)!important;background:rgba(184,255,60,.08)!important;box-shadow:0 0 14px rgba(184,255,60,.2);}
+.j-row.valide{border-color:rgba(74,222,128,.35);}
+.j-row.quiz{border-color:rgba(255,215,0,.25);}
+.j-row.perdu{border-color:rgba(255,68,68,.2);}
+.j-row.gagne{border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.06);}
+.j-nom{font-weight:800;font-size:.85rem;margin-bottom:2px;}
+.j-co{font-size:.62rem;color:var(--dim);}
+.j-badge{
+  display:inline-block;padding:2px 7px;border-radius:50px;
+  font-size:.58rem;font-weight:700;letter-spacing:.08em;margin-top:4px;
 }
-@keyframes card-glow{0%,100%{box-shadow:0 0 10px rgba(184,255,60,.2)}50%{box-shadow:0 0 28px rgba(184,255,60,.4)}}
-.j-num{font-family:'Bebas Neue',sans-serif;font-size:.8rem;color:var(--dim);min-width:18px;}
-.j-name{flex:1;font-weight:800;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.j-co{font-size:.65rem;color:var(--dim);}
-.j-lot-badge{font-size:.62rem;padding:2px 7px;border-radius:50px;background:var(--surface);color:var(--dim);}
-.j-lot-badge.karaoke{background:rgba(77,217,232,.15);color:var(--cyan);}
-.j-lot-badge.lumiere{background:rgba(217,70,239,.15);color:var(--magenta);}
-.j-lot-badge.cadeau{background:rgba(184,255,60,.15);color:var(--lime);}
-.j-lot-badge.gage{background:rgba(255,100,100,.15);color:#ff8888;}
+.b-inscrit{background:rgba(255,255,255,.08);color:var(--soft);}
+.b-quiz{background:rgba(255,215,0,.15);color:var(--or);}
+.b-valide{background:rgba(74,222,128,.15);color:var(--ok);}
+.b-perdu{background:rgba(255,68,68,.12);color:#ff8888;}
+.b-roue{background:rgba(184,255,60,.15);color:var(--lime);}
+.b-gagne{background:rgba(168,85,247,.18);color:var(--violet);}
 
-/* ── Colonne centrale roue ── */
-#proj-centre{
+/* Centre */
+#col-centre{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:24px 20px;gap:16px;overflow:hidden;position:relative;
+  padding:16px;gap:14px;position:relative;overflow:hidden;
 }
-.proj-bg-glow{
+.centre-bg{
   position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 60% at 50% 50%,rgba(168,85,247,.08) 0%,transparent 70%),
-    radial-gradient(ellipse 40% 30% at 30% 20%,rgba(77,217,232,.05) 0%,transparent 60%);
+  background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(168,85,247,.06) 0%,transparent 70%);
 }
-.wheel-wrap{position:relative;flex-shrink:0;}
-#proj-wheel{display:block;border-radius:50%;cursor:pointer;}
-.wheel-pointer{
-  position:absolute;top:-16px;left:50%;transform:translateX(-50%);
-  width:0;height:0;
-  border-left:13px solid transparent;border-right:13px solid transparent;
-  border-top:26px solid var(--lime);
-  filter:drop-shadow(0 0 10px var(--lime));
-  z-index:10;
+#wait-msg{
+  text-align:center;color:var(--dim);
 }
-.wheel-center-btn{
+#wait-msg h2{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.08em;margin-bottom:8px;color:rgba(255,255,255,.3);}
+#wait-msg p{font-size:.8rem;line-height:1.6;}
+#roue-zone{display:none;flex-direction:column;align-items:center;gap:12px;width:100%;}
+.roue-joueur-label{
+  font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.08em;text-align:center;
+}
+.roue-wrap{position:relative;flex-shrink:0;}
+#proj-canvas{display:block;border-radius:50%;box-shadow:0 0 50px rgba(168,85,247,.3);}
+.roue-ptr{
+  position:absolute;top:-14px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;
+  border-top:22px solid var(--lime);filter:drop-shadow(0 0 8px var(--lime));z-index:10;
+}
+.roue-center{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:70px;height:70px;border-radius:50%;
+  width:60px;height:60px;border-radius:50%;
   background:linear-gradient(135deg,var(--cyan),var(--violet));
-  border:3px solid var(--deep);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:.65rem;letter-spacing:.1em;
-  color:var(--deep);cursor:pointer;
-  box-shadow:0 0 24px rgba(77,217,232,.5);
+  border:3px solid var(--deep);display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:.6rem;letter-spacing:.08em;
+  color:var(--deep);cursor:pointer;box-shadow:0 0 20px rgba(77,217,232,.4);
   transition:transform .15s;z-index:20;
 }
-.wheel-center-btn:hover{transform:translate(-50%,-50%) scale(1.08);}
-.wheel-center-btn:active{transform:translate(-50%,-50%) scale(.95);}
-.wheel-center-btn.spinning{pointer-events:none;animation:center-pulse .5s ease-in-out infinite alternate;}
-@keyframes center-pulse{from{box-shadow:0 0 20px rgba(77,217,232,.4)}to{box-shadow:0 0 40px rgba(77,217,232,.8)}}
-
+.roue-center:hover{transform:translate(-50%,-50%) scale(1.08);}
+.roue-center:active{transform:translate(-50%,-50%) scale(.95);}
 #proj-spin-btn{
-  width:100%;max-width:420px;
-  padding:16px;border:none;border-radius:50px;
+  padding:14px 40px;border:none;border-radius:50px;
   background:linear-gradient(135deg,var(--cyan),var(--violet));
   color:var(--deep);font-family:'Bebas Neue',sans-serif;
-  font-size:1.2rem;letter-spacing:.15em;
-  cursor:pointer;transition:all .2s;
-  box-shadow:0 0 32px rgba(77,217,232,.35);
+  font-size:1rem;letter-spacing:.12em;cursor:pointer;
+  box-shadow:0 0 28px rgba(77,217,232,.3);transition:all .2s;
 }
-#proj-spin-btn:hover{transform:translateY(-1px);box-shadow:0 0 48px rgba(77,217,232,.5);}
-#proj-spin-btn:active{transform:scale(.97);}
+#proj-spin-btn:hover{opacity:.85;transform:translateY(-1px);}
 #proj-spin-btn:disabled{opacity:.35;cursor:default;transform:none;}
 
-/* ── Colonne droite résultat ── */
-#proj-right{
-  border-left:1px solid var(--border);
-  display:flex;flex-direction:column;
-  padding:20px 16px;gap:14px;overflow-y:auto;
+/* Droite */
+#col-right{
+  border-left:1px solid var(--bd);
+  display:flex;flex-direction:column;padding:14px;gap:12px;overflow-y:auto;
 }
-#result-card{
-  border-radius:18px;padding:24px 18px;text-align:center;
-  background:var(--surface);border:1px solid var(--border);
-  transition:all .4s;
+.r-section-lbl{
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+  margin-bottom:6px;display:flex;align-items:center;gap:6px;
 }
-#result-card.active-jeu{
-  background:rgba(168,85,247,.08);border-color:rgba(168,85,247,.4);
-  box-shadow:0 0 36px rgba(168,85,247,.15);
+.r-section-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
+.r-card{
+  border-radius:13px;padding:16px;
+  background:rgba(255,255,255,.04);border:1px solid var(--bd);
 }
-#result-card.active-cadeau{
-  background:rgba(184,255,60,.08);border-color:rgba(184,255,60,.4);
-  box-shadow:0 0 36px rgba(184,255,60,.15);
-}
-#result-card.active-gage{
-  background:rgba(255,100,100,.08);border-color:rgba(255,100,100,.4);
-  box-shadow:0 0 36px rgba(255,100,100,.15);
-}
-#res-emoji{font-size:2.8rem;margin-bottom:10px;display:block;animation:pop-in .5s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes pop-in{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-#res-type{
-  font-size:.65rem;letter-spacing:.22em;text-transform:uppercase;
-  margin-bottom:6px;color:var(--dim);
-}
-#res-titre{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(1.6rem,2.5vw,2.2rem);
-  letter-spacing:.04em;line-height:1.1;margin-bottom:10px;color:var(--texte);
-}
-#res-desc{font-size:.82rem;color:var(--soft);line-height:1.6;}
+#res-card{text-align:center;}
+#res-emoji{font-size:2.2rem;display:block;margin-bottom:8px;}
+#res-nom{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.04em;margin-bottom:4px;}
+#res-lot{font-size:.82rem;color:var(--soft);line-height:1.5;}
 
-.proj-section-title{
-  font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--dim);margin-bottom:8px;
-  display:flex;align-items:center;gap:8px;
-}
-.proj-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+/* Stats mini */
+.stats-2{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.s-box{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:9px;padding:10px;text-align:center;}
+.s-n{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cyan);}
+.s-l{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);margin-top:2px;}
 
-/* Chrono */
-#chrono-block{text-align:center;display:none;}
-#chrono-num{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(4rem,7vw,7rem);line-height:1;
-  color:var(--or);text-shadow:0 0 40px rgba(255,215,0,.4);
-}
-#chrono-num.urgent{color:var(--danger);animation:blink .5s step-end infinite;text-shadow:0 0 40px rgba(255,68,68,.5);}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-.btn-lancer{
-  width:100%;padding:12px;border:none;border-radius:50px;
-  background:linear-gradient(135deg,var(--success),#16a34a);
-  color:#0a1a0a;font-family:'Bebas Neue',sans-serif;
-  font-size:1rem;letter-spacing:.1em;cursor:pointer;
-  transition:all .2s;box-shadow:0 0 20px rgba(74,222,128,.3);
-  display:none;margin-top:6px;
-}
-.btn-lancer:hover{transform:translateY(-1px);}
-.btn-lancer:disabled{opacity:.4;cursor:default;transform:none;}
+/* QR */
+.qr-wrap{text-align:center;}
+.qr-wrap img{border-radius:8px;display:block;margin:0 auto 6px;}
+.qr-wrap p{font-size:.58rem;color:var(--dim);line-height:1.5;}
 
-/* Lot display in right column */
-.lot-history{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto;}
-.lot-item{padding:7px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--border);font-size:.72rem;display:flex;align-items:center;gap:8px;}
-.lot-item-emoji{font-size:1rem;}
-.lot-item-name{flex:1;font-weight:700;}
-.lot-item-time{font-size:.6rem;color:var(--dim);}
+/* Hist */
+.hist-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;}
+.hist-item{padding:6px 9px;border-radius:7px;font-size:.68rem;background:rgba(255,255,255,.04);border:1px solid var(--bd);display:flex;gap:7px;align-items:center;}
+.hist-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.hist-txt{flex:1;color:var(--soft);}
 
-/* ════════════════════════════════════════════════
-   VUE JOUEURS (portrait mobile preview)
-════════════════════════════════════════════════ */
+/* ══════════════════════════════════
+   VUE JOUEURS (mobile preview)
+══════════════════════════════════ */
 #view-player{
-  background:#1a1a2e;
+  background:#0d0d1a;
   align-items:center;justify-content:center;
-  gap:0;
+  overflow-y:auto;
 }
-.player-preview-wrap{
-  position:relative;
-  width:390px;height:calc(100% - 20px);max-height:844px;
+/* ── PLAYER APP (aussi utilisé en mode ?player) ── */
+#player-app{
+  width:min(390px,100vw);
+  min-height:calc(100dvh - 86px);
   background:var(--cosmos);
-  border-radius:36px;
-  border:2px solid rgba(255,255,255,.1);
-  overflow:hidden;
-  box-shadow:0 0 60px rgba(0,0,0,.8),0 0 120px rgba(77,217,232,.05);
+  border-radius:0;
   display:flex;flex-direction:column;
 }
-.player-notch{
-  width:120px;height:28px;
-  background:var(--cosmos);
-  border:2px solid rgba(255,255,255,.1);
-  border-top:none;border-radius:0 0 18px 18px;
-  position:absolute;top:0;left:50%;transform:translateX(-50%);
-  z-index:10;
+/* Wrapping pour la preview desktop */
+#view-player #player-app{
+  border-radius:32px;
+  border:2px solid rgba(255,255,255,.09);
+  box-shadow:0 0 60px rgba(0,0,0,.8);
+  min-height:700px;max-height:820px;
+  overflow:hidden;
 }
-.player-inner{
-  flex:1;overflow-y:auto;overflow-x:hidden;
-  padding:40px 20px 28px;
-  display:flex;flex-direction:column;align-items:center;
-  gap:14px;
-}
-.player-inner::-webkit-scrollbar{display:none;}
-.player-logo{
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.3em;
-  background:linear-gradient(135deg,var(--cyan),var(--magenta));
+.p-screen{display:none;flex-direction:column;flex:1;overflow-y:auto;}
+.p-screen.active{display:flex;}
+.p-screen::-webkit-scrollbar{display:none;}
+.p-inner{padding:28px 18px 24px;display:flex;flex-direction:column;align-items:center;gap:14px;flex:1;}
+
+.p-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.28em;
+  background:linear-gradient(135deg,var(--cyan),var(--mag));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-top:6px;
 }
-.player-wheel-mini{
-  width:220px;height:220px;border-radius:50%;
-  box-shadow:0 0 30px rgba(168,85,247,.3);flex-shrink:0;
-  display:block;
+.p-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.06em;text-align:center;line-height:1.15;}
+.p-sub{font-size:.78rem;color:var(--soft);text-align:center;line-height:1.6;}
+
+/* Formulaire */
+.p-field{width:100%;}
+.p-label{display:block;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--soft);margin-bottom:5px;}
+.p-input{
+  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);
+  border-radius:11px;padding:13px 14px;color:var(--tx);
+  font-family:'Nunito',sans-serif;font-size:.95rem;outline:none;
+  transition:border-color .2s;
 }
-.player-spin-btn{
-  width:100%;padding:18px;border:none;border-radius:50px;
+.p-input:focus{border-color:var(--cyan);}
+.p-input::placeholder{color:rgba(201,194,232,.3);}
+.p-err{color:var(--danger);font-size:.72rem;text-align:center;display:none;}
+
+/* Boutons */
+.p-btn{
+  width:100%;padding:16px;border:none;border-radius:50px;
   background:linear-gradient(135deg,var(--cyan),var(--violet));
   color:var(--deep);font-family:'Bebas Neue',sans-serif;
-  font-size:1.3rem;letter-spacing:.12em;cursor:pointer;
-  box-shadow:0 0 28px rgba(77,217,232,.35);
-  transition:all .15s;
+  font-size:1.05rem;letter-spacing:.1em;cursor:pointer;
+  box-shadow:0 0 24px rgba(77,217,232,.3);transition:all .15s;
 }
-.player-spin-btn:active{transform:scale(.96);}
-.player-spin-btn:disabled{opacity:.35;cursor:default;transform:none;}
-.player-result-box{
-  width:100%;border-radius:16px;padding:20px;
-  text-align:center;background:var(--surface);
-  border:1px solid var(--border);
+.p-btn:active{transform:scale(.97);}
+.p-btn:disabled{opacity:.35;cursor:default;transform:none;}
+.p-btn-ghost{
+  width:100%;padding:12px;border:1px solid var(--bd);border-radius:50px;
+  background:transparent;color:var(--dim);font-family:'Bebas Neue',sans-serif;
+  font-size:.85rem;letter-spacing:.08em;cursor:pointer;transition:all .2s;
 }
-.player-res-emoji{font-size:3rem;margin-bottom:8px;display:block;}
-.player-res-titre{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.04em;margin-bottom:6px;}
-.player-res-desc{font-size:.8rem;color:var(--soft);line-height:1.55;}
-.player-badge{
-  display:inline-block;padding:5px 14px;border-radius:50px;
-  font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;font-weight:800;
-  background:rgba(184,255,60,.15);border:1px solid rgba(184,255,60,.3);color:var(--lime);
+.p-btn-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+
+/* Catégories */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;}
+.cat-btn{
+  padding:14px 10px;border:1px solid var(--bd);border-radius:13px;
+  background:rgba(255,255,255,.04);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:all .2s;text-align:center;
 }
-.player-info-box{
-  width:100%;background:var(--surface);border-radius:12px;padding:14px;
-  font-size:.78rem;color:var(--soft);text-align:center;line-height:1.6;
+.cat-btn:active{transform:scale(.95);}
+.cat-emoji{font-size:1.6rem;}
+.cat-lbl{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:.1em;color:var(--tx);}
+
+/* Quiz */
+.quiz-progress{width:100%;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
+.quiz-prog-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--violet));border-radius:2px;transition:width .4s;}
+.q-num{font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);}
+.q-card{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--bd);
+  border-radius:14px;padding:18px;
 }
-.player-preview-label{
-  position:absolute;bottom:-32px;left:0;right:0;text-align:center;
-  font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;
-  color:rgba(255,255,255,.25);
+.q-text{font-size:.95rem;font-weight:700;line-height:1.45;}
+.q-opts{width:100%;display:flex;flex-direction:column;gap:8px;}
+.q-opt{
+  padding:12px 14px;border:1px solid var(--bd);border-radius:11px;
+  background:rgba(255,255,255,.04);cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  font-size:.85rem;color:var(--tx);transition:all .18s;text-align:left;width:100%;
 }
-.player-preview-side-note{
-  max-width:200px;text-align:center;
-  font-size:.78rem;color:var(--dim);line-height:1.6;
-  padding:0 10px;
+.q-opt:active{transform:scale(.97);}
+.q-opt:hover{border-color:var(--cyan);background:rgba(77,217,232,.07);}
+.q-opt.correct{border-color:var(--ok)!important;background:rgba(74,222,128,.12)!important;color:var(--ok);}
+.q-opt.wrong{border-color:var(--danger)!important;background:rgba(255,68,68,.1)!important;opacity:.7;}
+.q-opt:disabled{cursor:default;}
+.q-opt-letter{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(168,85,247,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.68rem;font-weight:700;flex-shrink:0;
+}
+/* Chrono bar */
+.chrono-bar{width:100%;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;}
+.chrono-fill{height:100%;background:var(--lime);border-radius:2px;transition:width 1s linear;}
+.chrono-fill.urgent{background:var(--danger);}
+
+/* Résultat quiz */
+.result-big{font-size:3rem;text-align:center;animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.result-msg{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.06em;text-align:center;}
+
+/* Roue joueur */
+.roue-player-wrap{position:relative;flex-shrink:0;}
+#player-canvas{display:block;border-radius:50%;box-shadow:0 0 30px rgba(168,85,247,.3);}
+.roue-ptr-sm{
+  position:absolute;top:-10px;left:50%;transform:translateX(-50%);
+  width:0;height:0;border-left:8px solid transparent;border-right:8px solid transparent;
+  border-top:16px solid var(--lime);filter:drop-shadow(0 0 6px var(--lime));z-index:10;
 }
 
-/* ════════════════════════════════════════════════
-   SETTINGS PANEL
-════════════════════════════════════════════════ */
+/* ══════════════════════════════════
+   SETTINGS
+══════════════════════════════════ */
 #settings-panel{
-  position:fixed;top:52px;right:0;bottom:0;width:min(520px,92vw);
+  position:fixed;top:86px;right:0;bottom:0;width:min(500px,92vw);
   background:var(--panel);border-left:2px solid var(--violet);
-  z-index:3000;overflow-y:auto;padding:28px;
-  box-shadow:-16px 0 60px rgba(0,0,0,.85);
+  z-index:400;overflow-y:auto;padding:24px;
   transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);
 }
 #settings-panel.open{transform:translateX(0);}
-.sp-title{
-  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:.1em;
-  background:linear-gradient(135deg,var(--cyan),var(--violet));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-bottom:24px;
-}
 .sp-close{
-  position:absolute;top:24px;right:24px;
-  background:transparent;border:1px solid var(--border);border-radius:50%;
-  width:32px;height:32px;color:var(--dim);font-size:.9rem;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:all .2s;
+  position:absolute;top:20px;right:20px;
+  background:transparent;border:1px solid var(--bd);border-radius:50%;
+  width:30px;height:30px;color:var(--dim);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
 }
 .sp-close:hover{border-color:var(--danger);color:var(--danger);}
-.sp-section{margin-bottom:28px;}
-.sp-section-title{
-  font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);
-  margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border);
-}
-.sp-field{margin-bottom:10px;}
-.sp-label{display:block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:5px;}
+.sp-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.1em;
+  background:linear-gradient(135deg,var(--cyan),var(--violet));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:20px;}
+.sp-sec{margin-bottom:22px;}
+.sp-sec-lbl{font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--bd);}
+.sp-field{margin-bottom:8px;}
+.sp-lbl{display:block;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:4px;}
 .sp-input{
-  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);
-  border-radius:10px;padding:10px 13px;color:var(--texte);
-  font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;
+  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--bd);
+  border-radius:9px;padding:9px 12px;color:var(--tx);
+  font-family:'Nunito',sans-serif;font-size:.82rem;outline:none;
   transition:border-color .2s;
 }
 .sp-input:focus{border-color:var(--cyan);}
-.sp-select{
-  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);
-  border-radius:10px;padding:10px 13px;color:var(--texte);
-  font-family:'Nunito',sans-serif;font-size:.88rem;outline:none;
-  cursor:pointer;
-}
-.sp-select option{background:#1a1038;color:var(--texte);}
-.sp-row{display:flex;gap:8px;align-items:flex-end;}
-.sp-toggle{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);
-  font-size:.82rem;
-}
-.sp-toggle-btn{
-  width:44px;height:24px;border-radius:12px;border:none;cursor:pointer;
-  background:rgba(255,255,255,.1);position:relative;transition:background .2s;
-  flex-shrink:0;
-}
-.sp-toggle-btn.on{background:var(--cyan);}
-.sp-toggle-btn::after{
-  content:'';position:absolute;top:3px;left:3px;
-  width:18px;height:18px;border-radius:50%;
-  background:#fff;transition:transform .2s;
-}
-.sp-toggle-btn.on::after{transform:translateX(20px);}
-/* Segments roue */
-.seg-editor{display:flex;flex-direction:column;gap:6px;}
-.seg-row{
-  display:grid;grid-template-columns:36px 1fr 100px 36px;
-  gap:6px;align-items:center;
-  padding:8px 10px;border-radius:10px;
-  background:rgba(255,255,255,.04);border:1px solid var(--border);
-}
-.seg-num{
-  width:28px;height:28px;border-radius:50%;
+.sp-lots{display:flex;flex-direction:column;gap:5px;}
+.sp-lot-row{display:flex;align-items:center;gap:7px;}
+.sp-lot-num{
+  width:24px;height:24px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Bebas Neue',sans-serif;font-size:.9rem;
+  font-family:'Bebas Neue',sans-serif;font-size:.72rem;
   color:var(--deep);flex-shrink:0;
 }
-.seg-name-inp{
-  background:transparent;border:none;outline:none;
-  color:var(--texte);font-family:'Nunito',sans-serif;
-  font-weight:700;font-size:.82rem;width:100%;
-  padding:2px 0;border-bottom:1px solid rgba(255,255,255,.1);
-}
-.seg-name-inp:focus{border-bottom-color:var(--cyan);}
-.seg-type-sel{
-  background:rgba(0,0,0,.3);border:1px solid var(--border);
-  border-radius:6px;padding:3px 6px;color:var(--texte);
-  font-size:.7rem;cursor:pointer;outline:none;
-}
-.seg-type-sel option{background:#1a1038;}
-.seg-emoji-inp{
-  width:36px;height:36px;background:rgba(255,255,255,.06);
-  border:1px solid var(--border);border-radius:8px;
-  text-align:center;font-size:1.2rem;outline:none;cursor:pointer;
-}
-/* joueurs settings */
-.sp-joueur-row{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);
-  font-size:.8rem;
-}
-.sp-joueur-name{flex:1;font-weight:700;}
-.sp-joueur-co{font-size:.65rem;color:var(--dim);}
-.sp-del-btn{
-  padding:3px 9px;border:1px solid rgba(255,68,68,.3);
-  background:transparent;border-radius:6px;color:rgba(255,68,68,.6);
-  font-size:.62rem;cursor:pointer;transition:all .2s;
-}
-.sp-del-btn:hover{border-color:var(--danger);color:var(--danger);}
-.sp-add-row{display:flex;gap:6px;margin-top:8px;}
-.sp-save-btn{
-  width:100%;padding:13px;border:none;border-radius:12px;
+.sp-save{
+  width:100%;padding:12px;border:none;border-radius:11px;
   background:linear-gradient(135deg,var(--cyan),var(--violet));
   color:var(--deep);font-family:'Bebas Neue',sans-serif;
-  font-size:1rem;letter-spacing:.1em;cursor:pointer;
-  margin-top:20px;transition:all .2s;
+  font-size:.95rem;letter-spacing:.1em;cursor:pointer;margin-top:16px;
 }
-.sp-save-btn:hover{opacity:.85;}
+.sp-export{
+  width:100%;padding:10px;border:1px solid var(--bd);border-radius:11px;
+  background:transparent;color:var(--soft);font-family:'Bebas Neue',sans-serif;
+  font-size:.82rem;letter-spacing:.08em;cursor:pointer;margin-top:8px;
+  transition:all .2s;
+}
+.sp-export:hover{border-color:var(--lime);color:var(--lime);}
 
-/* ════════════════════════════════════════════════
-   OVERLAY RÉSULTAT PLEIN ÉCRAN (projection)
-════════════════════════════════════════════════ */
-#result-overlay{
-  display:none;position:fixed;inset:0;z-index:4000;
-  background:rgba(5,0,26,.96);
+/* ══════════════════════════════════
+   OVERLAY RÉSULTAT
+══════════════════════════════════ */
+#ov-result{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(5,0,26,.97);
   flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:40px;
-  animation:fadeIn .3s ease both;
 }
-#result-overlay.show{display:flex;}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-#ro-emoji{font-size:clamp(4rem,10vw,8rem);margin-bottom:20px;animation:big-pop .6s cubic-bezier(.34,1.56,.64,1) both;}
-@keyframes big-pop{from{transform:scale(0) rotate(-25deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-#ro-type{font-size:.75rem;letter-spacing:.3em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;}
-#ro-titre{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(3rem,8vw,7rem);letter-spacing:.05em;line-height:1.05;
-  margin-bottom:16px;
+#ov-result.show{display:flex;}
+#ov-r-emoji{font-size:clamp(4rem,10vw,7rem);margin-bottom:16px;animation:bigpop .6s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes bigpop{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1);opacity:1}}
+#ov-r-joueur{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+#ov-r-lot{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,6vw,5rem);
+  letter-spacing:.05em;line-height:1.1;margin-bottom:12px;
+  background:linear-gradient(135deg,var(--lime),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-#ro-titre.t-jeu{background:linear-gradient(135deg,var(--violet),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-#ro-titre.t-cadeau{background:linear-gradient(135deg,var(--lime),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-#ro-titre.t-gage{background:linear-gradient(135deg,#ff8888,var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-#ro-desc{font-size:clamp(1rem,2.5vw,1.6rem);color:var(--soft);max-width:700px;line-height:1.6;margin-bottom:36px;}
-#ro-close{
-  padding:14px 40px;border:none;border-radius:50px;
+#ov-r-close{
+  margin-top:20px;padding:12px 36px;border:none;border-radius:50px;
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
-  color:var(--texte);font-family:'Bebas Neue',sans-serif;
-  font-size:1rem;letter-spacing:.1em;cursor:pointer;transition:all .2s;
+  color:var(--tx);font-family:'Bebas Neue',sans-serif;
+  font-size:.9rem;letter-spacing:.08em;cursor:pointer;
 }
-#ro-close:hover{background:rgba(255,255,255,.14);}
 
-/* Confetti overlay */
-#confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:5000;}
-.conf{position:absolute;width:8px;height:8px;top:-10px;border-radius:2px;animation:conf-fall linear both;}
-@keyframes conf-fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+/* confettis */
+#confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:600;}
+.conf{position:absolute;border-radius:2px;animation:cf linear both;}
+@keyframes cf{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
 </style>
 </head>
 <body>
 
-<!-- ════════════════════════════════════
-     TOPBAR GLOBALE
-════════════════════════════════════ -->
-<div id="g-topbar">
-  <div class="g-logo">LUMIIA&nbsp;<span>SPIN</span></div>
-  <div class="g-tabs">
-    <button class="g-tab active" onclick="setView('proj')">🎬 PROJECTION</button>
-    <button class="g-tab" onclick="setView('player')">📱 JOUEURS</button>
+<!-- BANDEAU PERMANENT -->
+<div id="bandeau">
+  <div id="bandeau-left">LUMIIA REDA SPIN &nbsp;·&nbsp; Team Building sur mesure &nbsp;·&nbsp; Aouste-sur-Sye (26)</div>
+  <div id="bandeau-right"><a href="https://lumiia.fr" target="_blank">lumiia.fr</a></div>
+</div>
+
+<!-- TOPBAR -->
+<div id="topbar" id="topbar-proj">
+  <div class="tb-logo">LUMIIA SPIN</div>
+  <div class="tb-v">v2.0</div>
+  <div class="tb-tabs">
+    <button class="tb-tab active" onclick="setView('proj')">🎬 PROJECTION</button>
+    <button class="tb-tab" onclick="setView('player')">📱 JOUEURS</button>
   </div>
-  <div class="g-spacer"></div>
-  <div class="g-right">
-    <span id="version-badge">v1.0</span>
-    <button class="g-btn" onclick="toggleSettings()">⚙️ Settings</button>
-    <button class="g-btn danger" onclick="resetSpin()">↺ Reset</button>
+  <div class="tb-sp"></div>
+  <div class="tb-right">
+    <button class="tb-btn" onclick="toggleSettings()">⚙ Settings</button>
+    <button class="tb-btn danger" onclick="resetAll()">↺ Reset</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     VUE PROJECTION
-════════════════════════════════════ -->
+<!-- ══ PROJECTION ══ -->
 <div class="view active" id="view-proj">
-  <div id="proj-main">
+  <div id="proj-grid">
 
     <!-- Gauche : joueurs -->
-    <div id="proj-left">
-      <div class="col-head">
-        <span class="col-head-label">👥 PARTICIPANTS</span>
-        <span class="col-head-count" id="nb-joueurs">0</span>
+    <div id="col-left">
+      <div class="col-hd">
+        <span class="col-hd-lbl">👥 PARTICIPANTS</span>
+        <span class="col-hd-val" id="nb-j">0</span>
       </div>
-      <div id="joueurs-list">
-        <div style="padding:20px;text-align:center;font-size:.8rem;color:var(--dim);">
-          Aucun participant pour l'instant…
+      <div id="j-list">
+        <div style="padding:20px;text-align:center;font-size:.78rem;color:var(--dim);">
+          En attente de participants…<br><br>
+          <small>Les joueurs s'inscrivent via QR code →</small>
         </div>
       </div>
     </div>
 
     <!-- Centre : roue -->
-    <div id="proj-centre">
-      <div class="proj-bg-glow"></div>
-      <div class="wheel-wrap">
-        <div class="wheel-pointer"></div>
-        <canvas id="proj-wheel"></canvas>
-        <div class="wheel-center-btn" id="wheel-center" onclick="spinWheel()">
-          SPIN
-        </div>
+    <div id="col-centre">
+      <div class="centre-bg"></div>
+      <div id="wait-msg">
+        <h2>EN ATTENTE</h2>
+        <p>Sélectionne un joueur <strong style="color:var(--ok);">Validé</strong><br>dans la liste pour lancer la roue</p>
       </div>
-      <button id="proj-spin-btn" onclick="spinWheel()">🎡 TOURNER LA ROUE</button>
+      <div id="roue-zone">
+        <div class="roue-joueur-label" id="roue-joueur-lbl">—</div>
+        <div class="roue-wrap">
+          <div class="roue-ptr"></div>
+          <canvas id="proj-canvas"></canvas>
+          <div class="roue-center" id="proj-center" onclick="spinProj()">SPIN</div>
+        </div>
+        <button id="proj-spin-btn" onclick="spinProj()">🎡 LANCER LA ROUE</button>
+      </div>
     </div>
 
-    <!-- Droite : résultat + historique -->
-    <div id="proj-right">
-
-      <!-- Résultat courant -->
-      <div id="result-card">
-        <span id="res-emoji" style="font-size:2.5rem;display:block;margin-bottom:8px;color:var(--dim);">✦</span>
-        <div id="res-type" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin-bottom:4px;">En attente</div>
-        <div id="res-titre" style="font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.04em;color:var(--dim);">Tourne la roue !</div>
-        <div id="res-desc" style="font-size:.78rem;color:var(--dim);margin-top:8px;line-height:1.5;">Appuie sur le bouton ou sur le centre de la roue pour commencer.</div>
-      </div>
-
-      <!-- Bouton lancer jeu + chrono -->
-      <div id="chrono-block">
-        <div id="chrono-num">20</div>
-        <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-top:4px;" id="chrono-label">secondes</div>
-      </div>
-      <button class="btn-lancer" id="btn-lancer" onclick="lancerJeu()">▶ LANCER LE JEU</button>
-
-      <!-- Historique -->
+    <!-- Droite : infos -->
+    <div id="col-right">
       <div>
-        <div class="proj-section-title">HISTORIQUE</div>
-        <div class="lot-history" id="lot-history">
-          <div style="font-size:.72rem;color:var(--dim);text-align:center;padding:8px;">—</div>
+        <div class="r-section-lbl">RÉSULTAT</div>
+        <div class="r-card" id="res-card">
+          <span id="res-emoji">🎡</span>
+          <div id="res-nom" style="color:var(--dim);">Aucun tirage</div>
+          <div id="res-lot" style="color:var(--dim);">Lance la roue pour un joueur validé</div>
         </div>
       </div>
-
+      <div>
+        <div class="r-section-lbl">STATS</div>
+        <div class="stats-2">
+          <div class="s-box"><div class="s-n" id="s-inscrits">0</div><div class="s-l">Inscrits</div></div>
+          <div class="s-box"><div class="s-n" id="s-valides">0</div><div class="s-l">Validés</div></div>
+          <div class="s-box"><div class="s-n" id="s-gagnes">0</div><div class="s-l">Lots gagnés</div></div>
+          <div class="s-box"><div class="s-n" id="s-encours">0</div><div class="s-l">En cours</div></div>
+        </div>
+      </div>
+      <div class="qr-wrap">
+        <div class="r-section-lbl">📱 QR JOUEURS</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&bgcolor=140932&color=4dd9e8&data=https%3A%2F%2Fi-immersion.github.io%2FLUMIIA-REDA-SPIN%2F%3Fplayer"
+          width="150" height="150" alt="QR Code" style="border-radius:8px;">
+        <p>i-immersion.github.io<br>/LUMIIA-REDA-SPIN/?player</p>
+      </div>
+      <div>
+        <div class="r-section-lbl">HISTORIQUE</div>
+        <div class="hist-list" id="hist-list">
+          <div style="font-size:.68rem;color:var(--dim);text-align:center;padding:5px;">—</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════════
-     VUE JOUEURS (preview mobile)
-════════════════════════════════════ -->
+<!-- ══ VUE JOUEURS (preview) ══ -->
 <div class="view" id="view-player">
-
-  <div style="position:relative">
-    <div class="player-preview-wrap" id="player-preview">
-      <div class="player-notch"></div>
-      <div class="player-inner">
-
-        <div class="player-logo">LUMIIA SPIN</div>
-
-        <div style="position:relative;width:220px;height:220px;flex-shrink:0;">
-          <div style="
-            position:absolute;top:-10px;left:50%;transform:translateX(-50%);
-            width:0;height:0;
-            border-left:8px solid transparent;border-right:8px solid transparent;
-            border-top:16px solid var(--lime);
-            filter:drop-shadow(0 0 6px var(--lime));z-index:10;
-          "></div>
-          <canvas class="player-wheel-mini" id="player-wheel"></canvas>
+  <div id="player-app">
+    <!-- ÉCRAN 1 : INSCRIPTION -->
+    <div class="p-screen active" id="ps-inscription">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="p-title">Bienvenue !</div>
+        <div class="p-sub">Inscris-toi pour jouer au quiz et tenter de gagner un cadeau LUMIIA</div>
+        <div class="p-field">
+          <label class="p-label">Prénom</label>
+          <input class="p-input" id="p-nom" type="text" placeholder="Ton prénom" autocomplete="given-name">
         </div>
-
-        <button class="player-spin-btn" id="player-spin-btn" onclick="playerRequestSpin()">
-          🎡 TOURNER
-        </button>
-
-        <div class="player-result-box" id="player-result-box">
-          <span class="player-res-emoji">✦</span>
-          <div class="player-res-titre" style="color:var(--dim);">En attente…</div>
-          <div class="player-res-desc">La roue n'a pas encore tourné.</div>
+        <div class="p-field">
+          <label class="p-label">Entreprise</label>
+          <input class="p-input" id="p-co" type="text" placeholder="Ton entreprise" autocomplete="organization">
         </div>
-
-        <div class="player-info-box">
-          <strong style="color:var(--cyan);">Évènement LUMIIA</strong><br>
-          Ton animateur peut aussi lancer<br>la roue depuis son écran.
+        <div class="p-field">
+          <label class="p-label">Email</label>
+          <input class="p-input" id="p-email" type="email" placeholder="ton@email.fr" autocomplete="email">
         </div>
-
+        <div class="p-err" id="p-err"></div>
+        <button class="p-btn" onclick="submitInscription()">C'est parti ! →</button>
+        <div style="font-size:.6rem;color:rgba(201,194,232,.25);text-align:center;line-height:1.5;">
+          Tes données sont uniquement utilisées dans le cadre de cet événement.
+        </div>
       </div>
     </div>
-    <div class="player-preview-label">Aperçu vue téléphone · App QR à venir</div>
-  </div>
 
-  <div class="player-preview-side-note">
-    <strong style="color:var(--cyan);display:block;margin-bottom:8px;">Cette vue est un aperçu.</strong>
-    L'application joueurs sera déployée séparément avec QR code.
-    <br><br>
-    Les joueurs verront la roue tourner en temps réel et pourront déclencher le spin si tu leur donnes la main.
-  </div>
+    <!-- ÉCRAN 2 : CATÉGORIES -->
+    <div class="p-screen" id="ps-categories">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="p-title" id="cat-bonjour">Bonjour !</div>
+        <div class="p-sub">Choisis ta catégorie de quiz.<br>5 questions — réponds juste pour lancer la roue !</div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+    </div>
 
+    <!-- ÉCRAN 3 : QUIZ -->
+    <div class="p-screen" id="ps-quiz">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="quiz-progress"><div class="quiz-prog-fill" id="quiz-prog" style="width:20%"></div></div>
+        <div class="q-num" id="q-num">Question 1 / 5</div>
+        <div class="chrono-bar"><div class="chrono-fill" id="chrono-fill" style="width:100%"></div></div>
+        <div class="q-card"><div class="q-text" id="q-text"></div></div>
+        <div class="q-opts" id="q-opts"></div>
+      </div>
+    </div>
+
+    <!-- ÉCRAN 4 : RÉSULTAT QUIZ -->
+    <div class="p-screen" id="ps-result">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="result-big" id="res-big">🎉</div>
+        <div class="result-msg" id="res-msg">BRAVO !</div>
+        <div class="p-sub" id="res-sub"></div>
+        <button class="p-btn" id="res-action" onclick="retryQuiz()">Réessayer</button>
+        <button class="p-btn-ghost" id="res-change-cat" onclick="goToCategories()" style="display:none">Changer de catégorie</button>
+      </div>
+    </div>
+
+    <!-- ÉCRAN 5 : ROUE -->
+    <div class="p-screen" id="ps-roue">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="p-title" style="font-size:1.1rem;">À toi de jouer !</div>
+        <div class="roue-player-wrap">
+          <div class="roue-ptr-sm"></div>
+          <canvas id="player-canvas"></canvas>
+        </div>
+        <button class="p-btn" id="player-spin-btn" onclick="playerSpin()">🎡 TOURNER LA ROUE !</button>
+        <div class="p-sub">Appuie sur le bouton pour faire tourner la roue !</div>
+      </div>
+    </div>
+
+    <!-- ÉCRAN 6 : ATTENTE APRÈS GAIN -->
+    <div class="p-screen" id="ps-attente">
+      <div class="p-inner">
+        <div class="p-logo">LUMIIA REDA SPIN</div>
+        <div class="result-big">✅</div>
+        <div class="result-msg" id="attente-msg">Quiz validé !</div>
+        <div class="p-sub" id="attente-sub">Rends-toi au stand LUMIIA pour lancer la roue en direct !</div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- ════════════════════════════════════
-     OVERLAY RÉSULTAT PLEIN ÉCRAN
-════════════════════════════════════ -->
-<div id="result-overlay">
-  <span id="ro-emoji">🎡</span>
-  <div id="ro-type">Jeu</div>
-  <div id="ro-titre" class="t-jeu">Titre</div>
-  <div id="ro-desc">Description</div>
-  <button id="ro-close" onclick="closeOverlay()">✕ Fermer</button>
-</div>
-
-<!-- Confettis -->
-<div id="confetti-wrap"></div>
-
-<!-- ════════════════════════════════════
-     SETTINGS PANEL
-════════════════════════════════════ -->
+<!-- SETTINGS -->
 <div id="settings-panel">
   <button class="sp-close" onclick="toggleSettings()">✕</button>
   <div class="sp-title">⚙ SETTINGS</div>
-
-  <!-- ROUE — 8 segments -->
-  <div class="sp-section">
-    <div class="sp-section-title">🎡 Cases de la roue (8)</div>
-    <div class="seg-editor" id="seg-editor">
-      <!-- généré JS -->
-    </div>
+  <div class="sp-sec">
+    <div class="sp-sec-lbl">🎁 Lots de la roue (modifiables)</div>
+    <div class="sp-lots" id="sp-lots"></div>
   </div>
-
-  <!-- PARAMÈTRES JEU -->
-  <div class="sp-section">
-    <div class="sp-section-title">⏱ Paramètres de jeu</div>
-    <div class="sp-field">
-      <label class="sp-label">Durée chrono par défaut (secondes)</label>
-      <input type="number" class="sp-input" id="sp-duree" value="30" min="5" max="300">
-    </div>
-    <div class="sp-field">
-      <label class="sp-label">Texte du prix CADEAU</label>
-      <input type="text" class="sp-input" id="sp-cadeau-txt" value="🎁 Tu remportes un bon cadeau LUMIIA ! On te contacte très vite 🎉" placeholder="Description du cadeau">
-    </div>
-    <div class="sp-field">
-      <label class="sp-label">Texte du GAGE</label>
-      <input type="text" class="sp-input" id="sp-gage-txt" value="😈 Gage ! L'animateur va te donner un défi à relever devant tout le monde…" placeholder="Description du gage">
-    </div>
+  <div class="sp-sec">
+    <div class="sp-sec-lbl">⏱ Durée par question (secondes)</div>
+    <input type="number" class="sp-input" id="sp-duree" value="15" min="5" max="60">
   </div>
-
-  <!-- AFFICHAGE -->
-  <div class="sp-section">
-    <div class="sp-section-title">🎨 Affichage</div>
-    <div class="sp-toggle">
-      <span>Overlay plein écran au résultat</span>
-      <button class="sp-toggle-btn on" id="tog-overlay" onclick="toggle('tog-overlay','overlay')"></button>
-    </div>
-    <div class="sp-toggle">
-      <span>Confettis</span>
-      <button class="sp-toggle-btn on" id="tog-confetti" onclick="toggle('tog-confetti','confetti')"></button>
-    </div>
-    <div class="sp-toggle">
-      <span>Sons</span>
-      <button class="sp-toggle-btn on" id="tog-sound" onclick="toggle('tog-sound','sound')"></button>
-    </div>
-    <div class="sp-toggle">
-      <span>Joueurs peuvent lancer la roue</span>
-      <button class="sp-toggle-btn" id="tog-player-spin" onclick="toggle('tog-player-spin','playerSpin')"></button>
-    </div>
-  </div>
-
-  <!-- PARTICIPANTS -->
-  <div class="sp-section">
-    <div class="sp-section-title">👥 Participants (<span id="sp-nb-joueurs">0</span>)</div>
-    <div id="sp-joueurs-list"></div>
-    <div class="sp-add-row">
-      <input type="text" class="sp-input" id="sp-add-nom" placeholder="Prénom" style="flex:1">
-      <input type="text" class="sp-input" id="sp-add-co" placeholder="Entreprise" style="flex:1">
-      <button class="g-btn" onclick="addJoueur()" style="white-space:nowrap;border-radius:10px;padding:0 14px;">+ Ajouter</button>
-    </div>
-  </div>
-
-  <!-- FIREBASE -->
-  <div class="sp-section">
-    <div class="sp-section-title">🔥 Firebase</div>
-    <div class="sp-field">
-      <label class="sp-label">Chemin DB</label>
-      <input type="text" class="sp-input" id="sp-fb-path" value="redaspin">
-    </div>
-    <div style="font-size:.68rem;color:var(--dim);line-height:1.5;margin-top:4px;">
-      Projet : lumiia-live · europe-west1
-    </div>
-  </div>
-
-  <button class="sp-save-btn" onclick="saveSettings()">💾 Enregistrer les settings</button>
+  <button class="sp-save" onclick="saveSettings()">💾 Enregistrer</button>
+  <button class="sp-export" onclick="exportCSV()">📥 Export CSV leads</button>
 </div>
 
+<!-- OVERLAY RÉSULTAT -->
+<div id="ov-result">
+  <span id="ov-r-emoji">🎁</span>
+  <div id="ov-r-joueur"></div>
+  <div id="ov-r-lot">Cadeau</div>
+  <button id="ov-r-close" onclick="closeOverlay()">✕ Fermer</button>
+</div>
 
-<!-- ════════════════════════════════════
-     JS PRINCIPAL
-════════════════════════════════════ -->
+<div id="confetti-wrap"></div>
+
 <script>
-/* ════════════════════════════════════════
-   FIREBASE CONFIG (même projet que v13)
-════════════════════════════════════════ */
-const FB_CONFIG = {
-  apiKey:            "AIzaSyDXkJzBPkV6Uad56WBqL0fCKgjMIPQS-YE",
-  authDomain:        "lumiia-live.firebaseapp.com",
-  databaseURL:       "https://lumiia-live-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:         "lumiia-live",
-  storageBucket:     "lumiia-live.appspot.com",
-  messagingSenderId: "823919513931",
-  appId:             "1:823919513931:web:6f6f3c7c6d1699457b18ce"
+const QUIZ_DATA = {
+  musique: {
+    label: `Musique`,
+    emoji: `🎵`,
+    color: `#d946ef`,
+    questions: [
+      { q: `Quel artiste a sorti l'album "Thriller" ?`, o: [`Michael Jackson`, `The Beatles`, `Queen`, `Madonna`], c: 0 },
+      { q: `Combien de musiciens dans un quatuor ?`, o: [`2`, `3`, `4`, `5`], c: 2 },
+      { q: `Dans quel pays est né Mozart ?`, o: [`Allemagne`, `France`, `Autriche`, `Italie`], c: 2 },
+      { q: `Quel groupe chante "We Will Rock You" ?`, o: [`AC/DC`, `Queen`, `Rolling Stones`, `U2`], c: 1 },
+      { q: `"La Bamba" est une chanson... ?`, o: [`Mexicaine`, `Brésilienne`, `Espagnole`, `Cubaine`], c: 0 },
+      { q: `Qui chante "Superstition" ?`, o: [`Stevie Wonder`, `Ray Charles`, `James Brown`, `Marvin Gaye`], c: 0 },
+      { q: `Quel artiste a sorti "Shape of You" en 2017 ?`, o: [`Justin Bieber`, `Ed Sheeran`, `Bruno Mars`, `Harry Styles`], c: 1 },
+      { q: `Quelle chanteuse s'appelle aussi "Queen B" ?`, o: [`Rihanna`, `Beyoncé`, `Adele`, `Lady Gaga`], c: 1 },
+      { q: `Quel instrument joue principalement Jimi Hendrix ?`, o: [`Batterie`, `Piano`, `Guitare`, `Basse`], c: 2 },
+      { q: `Qui a composé la "Lettre à Élise" ?`, o: [`Mozart`, `Chopin`, `Beethoven`, `Bach`], c: 2 },
+    ]
+  },
+  sport: {
+    label: `Sport`,
+    emoji: `⚽`,
+    color: `#4dd9e8`,
+    questions: [
+      { q: `Combien de joueurs dans une équipe de football ?`, o: [`9`, `10`, `11`, `12`], c: 2 },
+      { q: `Quel pays a remporté la Coupe du Monde 2018 ?`, o: [`Brésil`, `Allemagne`, `France`, `Argentine`], c: 2 },
+      { q: `Dans quel sport utilise-t-on un volant ?`, o: [`Tennis`, `Badminton`, `Squash`, `Ping-pong`], c: 1 },
+      { q: `Quel nageur a remporté 23 médailles d'or olympiques ?`, o: [`Ian Thorpe`, `Michael Phelps`, `Ryan Lochte`, `Mark Spitz`], c: 1 },
+      { q: `Combien de trous compte un parcours de golf classique ?`, o: [`12`, `16`, `18`, `20`], c: 2 },
+      { q: `Les "All Blacks" sont l'équipe nationale de... ?`, o: [`Australie`, `Afrique du Sud`, `Nouvelle-Zélande`, `Angleterre`], c: 2 },
+      { q: `Combien de joueurs dans une équipe de basketball ?`, o: [`4`, `5`, `6`, `7`], c: 1 },
+      { q: `Dans quel sport marque-t-on un "essai" ?`, o: [`Football`, `Rugby`, `Handball`, `Volleyball`], c: 1 },
+      { q: `Quel pays a remporté le plus de Coupes du Monde de football ?`, o: [`Allemagne`, `Argentine`, `Brésil`, `France`], c: 2 },
+      { q: `Combien de sets maximum dans un match de tennis Grand Chelem (hommes) ?`, o: [`3`, `4`, `5`, `6`], c: 2 },
+    ]
+  },
+  cinema: {
+    label: `Cinéma`,
+    emoji: `🎬`,
+    color: `#a855f7`,
+    questions: [
+      { q: `Qui réalise la saga "Star Wars" originale ?`, o: [`Steven Spielberg`, `George Lucas`, `James Cameron`, `Christopher Nolan`], c: 1 },
+      { q: `Quelle actrice joue Hermione dans Harry Potter ?`, o: [`Keira Knightley`, `Emma Watson`, `Emma Stone`, `Natalie Portman`], c: 1 },
+      { q: `Qui joue Jack dans Titanic ?`, o: [`Brad Pitt`, `Johnny Depp`, `Leonardo DiCaprio`, `Tom Hanks`], c: 2 },
+      { q: `Comment s'appelle le poisson amnésique de Nemo ?`, o: [`Nemo`, `Dory`, `Bruce`, `Pearl`], c: 1 },
+      { q: `Quel acteur joue Iron Man ?`, o: [`Chris Evans`, `Robert Downey Jr`, `Chris Hemsworth`, `Mark Ruffalo`], c: 1 },
+      { q: `Quelle est la planète dans "Avatar" ?`, o: [`Pandora`, `Naboo`, `Krypton`, `Tatooine`], c: 0 },
+      { q: `Quel film remporte l'Oscar du meilleur film en 1994 ?`, o: [`Forrest Gump`, `Pulp Fiction`, `Shawshank`, `The Lion King`], c: 0 },
+      { q: `Dans quel film entend-on "Je reviendrai" (I'll be back) ?`, o: [`Predator`, `Terminator`, `Robocop`, `Total Recall`], c: 1 },
+      { q: `Comment s'appelle l'oncle de Simba dans "Le Roi Lion" ?`, o: [`Scar`, `Mufasa`, `Timon`, `Rafiki`], c: 0 },
+      { q: `Combien de films dans la trilogie "Le Seigneur des Anneaux" ?`, o: [`2`, `3`, `4`, `5`], c: 1 },
+    ]
+  },
+  histoire: {
+    label: `Histoire`,
+    emoji: `🏛️`,
+    color: `#b8ff3c`,
+    questions: [
+      { q: `En quelle année a été prise la Bastille ?`, o: [`1688`, `1789`, `1815`, `1870`], c: 1 },
+      { q: `Qui était le premier Président des États-Unis ?`, o: [`Abraham Lincoln`, `Thomas Jefferson`, `George Washington`, `Benjamin Franklin`], c: 2 },
+      { q: `En quelle année est tombé le mur de Berlin ?`, o: [`1985`, `1987`, `1989`, `1991`], c: 2 },
+      { q: `Napoléon Bonaparte était originaire de... ?`, o: [`France continentale`, `Italie`, `Corse`, `Espagne`], c: 2 },
+      { q: `Qui a découvert l'Amérique en 1492 selon la tradition ?`, o: [`Magellan`, `Vasco de Gama`, `Christophe Colomb`, `Amerigo Vespucci`], c: 2 },
+      { q: `La Seconde Guerre Mondiale s'est terminée en... ?`, o: [`1943`, `1944`, `1945`, `1946`], c: 2 },
+      { q: `Quel empire était gouverné par Jules César ?`, o: [`Grec`, `Romain`, `Perse`, `Ottoman`], c: 1 },
+      { q: `La Révolution française a commencé en... ?`, o: [`1785`, `1789`, `1793`, `1799`], c: 1 },
+      { q: `Quelle reine d'Égypte est célèbre pour sa beauté légendaire ?`, o: [`Néfertiti`, `Cléopâtre`, `Hatchepsout`, `Tiyi`], c: 1 },
+      { q: `Dans quel pays a eu lieu la Révolution bolchévique de 1917 ?`, o: [`Allemagne`, `France`, `Russie`, `Autriche`], c: 2 },
+    ]
+  },
+  geographie: {
+    label: `Géographie`,
+    emoji: `🌍`,
+    color: `#4dd9e8`,
+    questions: [
+      { q: `Quelle est la capitale de l'Australie ?`, o: [`Sydney`, `Melbourne`, `Brisbane`, `Canberra`], c: 3 },
+      { q: `Quel est le plus grand océan du monde ?`, o: [`Atlantique`, `Arctique`, `Indien`, `Pacifique`], c: 3 },
+      { q: `Dans quel pays se trouve le Machu Picchu ?`, o: [`Chili`, `Bolivie`, `Pérou`, `Équateur`], c: 2 },
+      { q: `Quel pays a la plus grande superficie ?`, o: [`Canada`, `Chine`, `USA`, `Russie`], c: 3 },
+      { q: `Dans quel pays se trouve la Tour de Pise ?`, o: [`France`, `Espagne`, `Grèce`, `Italie`], c: 3 },
+      { q: `Quel est le plus petit pays du monde ?`, o: [`Monaco`, `Saint-Marin`, `Liechtenstein`, `Vatican`], c: 3 },
+      { q: `Combien de pays composent l'Afrique ?`, o: [`44`, `50`, `54`, `60`], c: 2 },
+      { q: `Quelle est la capitale du Brésil ?`, o: [`São Paulo`, `Rio de Janeiro`, `Brasilia`, `Salvador`], c: 2 },
+      { q: `Dans quel pays se trouve le mont Kilimandjaro ?`, o: [`Kenya`, `Tanzanie`, `Éthiopie`, `Ouganda`], c: 1 },
+      { q: `Quel fleuve traverse Paris ?`, o: [`Loire`, `Rhône`, `Seine`, `Garonne`], c: 2 },
+    ]
+  },
+  science: {
+    label: `Science`,
+    emoji: `🔬`,
+    color: `#d946ef`,
+    questions: [
+      { q: `Quelle est la formule chimique de l'eau ?`, o: [`HO2`, `H2O2`, `H2O`, `OH`], c: 2 },
+      { q: `Combien de planètes dans le système solaire ?`, o: [`7`, `8`, `9`, `10`], c: 1 },
+      { q: `Qui a formulé la loi de la gravité (légende de la pomme) ?`, o: [`Einstein`, `Newton`, `Darwin`, `Galilée`], c: 1 },
+      { q: `Quel gaz les plantes absorbent-elles pour la photosynthèse ?`, o: [`Oxygène`, `Azote`, `CO2`, `Hydrogène`], c: 2 },
+      { q: `Combien de chromosomes a l'être humain ?`, o: [`23`, `44`, `46`, `48`], c: 2 },
+      { q: `Quel est l'élément le plus léger du tableau périodique ?`, o: [`Hélium`, `Hydrogène`, `Lithium`, `Oxygène`], c: 1 },
+      { q: `Quelle planète est la plus proche du Soleil ?`, o: [`Vénus`, `Mercure`, `Mars`, `Terre`], c: 1 },
+      { q: `À quelle température l'eau bout-elle au niveau de la mer ?`, o: [`90°C`, `95°C`, `100°C`, `105°C`], c: 2 },
+      { q: `Qui a développé la théorie de l'évolution des espèces ?`, o: [`Pasteur`, `Darwin`, `Mendel`, `Lamarck`], c: 1 },
+      { q: `Combien d'os compte le corps humain adulte ?`, o: [`186`, `206`, `226`, `246`], c: 1 },
+    ]
+  },
+  cuisine: {
+    label: `Cuisine`,
+    emoji: `🍽️`,
+    color: `#ffd700`,
+    questions: [
+      { q: `De quel pays vient le sushi ?`, o: [`Chine`, `Corée`, `Thaïlande`, `Japon`], c: 3 },
+      { q: `Quel fruit donne le guacamole ?`, o: [`Mangue`, `Avocat`, `Papaye`, `Citron`], c: 1 },
+      { q: `Quelle épice donne sa couleur jaune au curry ?`, o: [`Safran`, `Curcuma`, `Cumin`, `Gingembre`], c: 1 },
+      { q: `Le croissant est originaire de... ?`, o: [`France`, `Autriche`, `Italie`, `Belgique`], c: 1 },
+      { q: `La baguette est un symbole gastronomique de... ?`, o: [`Belgique`, `Suisse`, `France`, `Canada`], c: 2 },
+      { q: `Quel alcool entre dans la composition du tiramisu ?`, o: [`Rhum`, `Amaretto`, `Marsala`, `Limoncello`], c: 2 },
+      { q: `Le foie gras est une spécialité de quelle région française ?`, o: [`Bretagne`, `Alsace`, `Périgord`, `Provence`], c: 2 },
+      { q: `De quel pays vient la paella ?`, o: [`Portugal`, `Italie`, `Mexique`, `Espagne`], c: 3 },
+      { q: `Quelle est la base d'une sauce béchamel ?`, o: [`Crème fraîche`, `Beurre+farine+lait`, `Tomate`, `Huile d'olive`], c: 1 },
+      { q: `Le camembert est fabriqué à partir de lait de... ?`, o: [`Chèvre`, `Vache`, `Brebis`, `Bufflonne`], c: 1 },
+    ]
+  },
+  culture: {
+    label: `Culture G.`,
+    emoji: `🎭`,
+    color: `#a855f7`,
+    questions: [
+      { q: `Combien de couleurs compte l'arc-en-ciel ?`, o: [`5`, `6`, `7`, `8`], c: 2 },
+      { q: `Qui a peint la Joconde ?`, o: [`Michel-Ange`, `Raphaël`, `Léonard de Vinci`, `Botticelli`], c: 2 },
+      { q: `Quel est le plus grand mammifère marin ?`, o: [`Requin baleine`, `Baleine bleue`, `Cachalot`, `Dauphin`], c: 1 },
+      { q: `Quel est le pays le plus peuplé du monde (2024) ?`, o: [`Chine`, `Inde`, `USA`, `Indonésie`], c: 1 },
+      { q: `Dans quelle ville se trouve la Sagrada Familia ?`, o: [`Madrid`, `Lisbonne`, `Barcelone`, `Séville`], c: 2 },
+      { q: `Quel auteur a écrit "Les Misérables" ?`, o: [`Balzac`, `Zola`, `Flaubert`, `Victor Hugo`], c: 3 },
+      { q: `Combien de faces a un cube ?`, o: [`4`, `5`, `6`, `8`], c: 2 },
+      { q: `Quelle est la monnaie du Japon ?`, o: [`Won`, `Yuan`, `Yen`, `Baht`], c: 2 },
+      { q: `Combien de lettres compte l'alphabet français ?`, o: [`24`, `25`, `26`, `27`], c: 2 },
+      { q: `Quel animal est le symbole de la paix ?`, o: [`Colombe`, `Aigle`, `Cygne`, `Hibou`], c: 0 },
+    ]
+  },
 };
+
+// ══════════════════════
+// CONFIG + ÉTAT
+// ══════════════════════
+const FB_CFG = {
+  apiKey: 'AIzaSyDXkJzBPkV6Uad56WBqL0fCKgjMIPQS-YE',
+  databaseURL: 'https://lumiia-live-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'lumiia-live'
+};
+const FB_PATH = 'redaspin';
 let db = null;
-function initFB(){
-  try{
-    if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
-    db = firebase.database();
-    fbListen();
-    console.log('[SPIN] Firebase OK');
-  }catch(e){ console.warn('[SPIN] Firebase erreur',e); }
-}
-function fbPath(){ return document.getElementById('sp-fb-path').value||'salon/spin'; }
 
-/* ════════════════════════════════════════
-   CONFIG SEGMENTS ROUE (8 cases)
-   types : 'jeu' | 'cadeau' | 'gage'
-════════════════════════════════════════ */
-let SEGMENTS = [
-  { id:1, emoji:'🎮', nom:'JEU 1',           type:'jeu',    desc:'Description du mini-jeu 1 — à définir',   duree:30, couleur:'#7c3aed' },
-  { id:2, emoji:'🎲', nom:'JEU 2',           type:'jeu',    desc:'Description du mini-jeu 2 — à définir',   duree:30, couleur:'#0284c7' },
-  { id:3, emoji:'🎵', nom:'JEU 3',           type:'jeu',    desc:'Description du mini-jeu 3 — à définir',   duree:30, couleur:'#0f766e' },
-  { id:4, emoji:'🎤', nom:'JEU 4',           type:'jeu',    desc:'Description du mini-jeu 4 — à définir',   duree:30, couleur:'#b45309' },
-  { id:5, emoji:'💡', nom:'JEU 5',           type:'jeu',    desc:'Description du mini-jeu 5 — à définir',   duree:30, couleur:'#0369a1' },
-  { id:6, emoji:'⚡', nom:'JEU 6',           type:'jeu',    desc:'Description du mini-jeu 6 — à définir',   duree:30, couleur:'#7e22ce' },
-  { id:7, emoji:'🎁', nom:'CADEAU',          type:'cadeau', desc:'🎁 Tu remportes un bon cadeau LUMIIA !',   duree:0,  couleur:'#15803d' },
-  { id:8, emoji:'😈', nom:'GAGE',            type:'gage',   desc:'Gage ! L\'animateur va te donner un défi…', duree:0, couleur:'#9f1239' },
+let LOTS = [
+  `Session karaok\u00e9 room 3 pers.`,
+  `Session Enigmatik game 2 pers.`,
+  `Session d\u00e9foule room 3 pers.`,
+  `Cocktail au choix au LUMIIA Bar`,
+  `Hollywood super green 10 pers`,
+  `Tirage au sort Team Building valeur 1000\u20ac`,
+  `Bocal ratatouille`,
+  `Bocal soupe`
 ];
+const LOT_COLORS = ['#0f766e','#0284c7','#7c3aed','#d946ef','#b45309','#15803d','#9f1239','#1e40af'];
+const LOT_EMOJIS = ['\uD83C\uDFA4','\uD83D\uDD0D','\uD83D\uDCAA','\uD83C\uDF79','\uD83C\uDF1F','\uD83C\uDFC6','\uD83C\uDF72','\uD83C\uDF72'];
 
-/* ════════════════════════════════════════
-   SETTINGS STATE
-════════════════════════════════════════ */
-let cfg = {
-  overlay: true, confetti: true, sound: true, playerSpin: false,
-  duree: 30,
-};
+let cfg = { duree: 15 };
+let joueurs = {};
+let joueurActif = null;
+let isPlayerMode = false;
+let myKey = null;
+let wheelAngle = 0;
+let isSpinning = false;
+let hist = [];
 
-/* ════════════════════════════════════════
-   GAME STATE
-════════════════════════════════════════ */
-let joueurs = [];
-let spinState = { spinning: false, result: null };
-let history  = [];
+// Quiz state
+let qState = { questions: [], idx: 0, score: 0, cat: null };
 let chronoInt = null;
-let chronoSec = 0;
 
-/* ════════════════════════════════════════
-   VUES
-════════════════════════════════════════ */
-function setView(v){
-  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.g-tab').forEach(el=>el.classList.remove('active'));
-  document.getElementById('view-'+v).classList.add('active');
-  document.querySelectorAll('.g-tab')[v==='proj'?0:1].classList.add('active');
-  if(v==='player') syncMiniWheel();
+// ══════════════════════
+// FIREBASE
+// ══════════════════════
+function initFB() {
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(FB_CFG);
+    db = firebase.database();
+    db.ref(`${FB_PATH}/joueurs`).on('value', snap => {
+      joueurs = {};
+      snap.forEach(c => { joueurs[c.key] = c.val(); });
+      renderJoueurs();
+      updateStats();
+      if (isPlayerMode && myKey) checkMyStatus();
+    });
+    db.ref(`${FB_PATH}/actif`).on('value', snap => {
+      const id = snap.val();
+      if (isPlayerMode && id === myKey) goToRouePlayer();
+      if (!isPlayerMode && id) showRoueProj(id);
+    });
+    db.ref(`${FB_PATH}/spin`).on('value', snap => {
+      const d = snap.val();
+      if (d && d.result !== undefined) animateSpin(d.result, d.joueurKey);
+    });
+    db.ref(`${FB_PATH}/settings`).once('value', snap => {
+      const d = snap.val();
+      if (d) {
+        if (d.lots) LOTS = d.lots;
+        if (d.duree) cfg.duree = d.duree;
+      }
+      drawWheel('proj-canvas', getWheelSize(), wheelAngle);
+      drawWheel('player-canvas', 220, wheelAngle);
+    });
+  } catch(e) { console.warn('FB', e); }
 }
 
-/* ════════════════════════════════════════
-   ROUE — dessin canvas
-════════════════════════════════════════ */
-let wheelAngle = 0; // angle courant (radians)
+// ══════════════════════
+// ROUTING
+// ══════════════════════
+function init() {
+  isPlayerMode = window.location.search.includes('player');
+  if (isPlayerMode) {
+    document.getElementById('topbar').style.display = 'none';
+    document.getElementById('bandeau').style.display = 'none';
+    const app = document.getElementById('player-app');
+    app.style.minHeight = '100dvh';
+    app.style.borderRadius = '0';
+    document.getElementById('view-player').style.top = '0';
+    document.getElementById('view-player').style.background = 'var(--cosmos)';
+    document.getElementById('view-player').style.justifyContent = 'flex-start';
+    document.getElementById('view-player').classList.add('active');
+    document.getElementById('view-proj').classList.remove('active');
+    // Récupérer clé stockée
+    myKey = localStorage.getItem('llspin_key');
+    if (myKey && joueurs[myKey]) restorePlayerState();
+    initFB();
+  } else {
+    initFB();
+    setTimeout(() => {
+      drawWheel('proj-canvas', getWheelSize(), 0);
+      drawWheel('player-canvas', 220, 0);
+    }, 200);
+  }
+}
 
-function drawWheel(canvasId, size, angle){
-  const c = document.getElementById(canvasId);
-  if(!c) return;
-  c.width = c.height = size;
-  const ctx = c.getContext('2d');
-  const cx = size/2, r = cx - 4;
-  const seg = (2*Math.PI)/SEGMENTS.length;
-  ctx.clearRect(0,0,size,size);
+// ══════════════════════
+// VUES
+// ══════════════════════
+function setView(v) {
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tb-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  document.querySelectorAll('.tb-tab')[v === 'proj' ? 0 : 1].classList.add('active');
+  if (v === 'player') drawWheel('player-canvas', 220, wheelAngle);
+}
 
-  // Halo outer
+function goPlayerScreen(id) {
+  document.querySelectorAll('.p-screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ══════════════════════
+// INSCRIPTION
+// ══════════════════════
+function submitInscription() {
+  const nom = document.getElementById('p-nom').value.trim();
+  const co = document.getElementById('p-co').value.trim();
+  const email = document.getElementById('p-email').value.trim();
+  const err = document.getElementById('p-err');
+  err.style.display = 'none';
+  if (!nom) { showErr(`Saisis ton pr\u00e9nom`); return; }
+  if (!email || !email.includes('@')) { showErr(`Email invalide`); return; }
+  if (!co) { showErr(`Nom de ton entreprise ?`); return; }
+  const data = { nom, co, email, status: 'inscrit', ts: Date.now() };
+  if (db) {
+    const ref = db.ref(`${FB_PATH}/joueurs`).push(data);
+    myKey = ref.key;
+    localStorage.setItem('llspin_key', myKey);
+  } else {
+    myKey = 'local_' + Date.now();
+    localStorage.setItem('llspin_key', myKey);
+  }
+  goToCategories();
+}
+function showErr(msg) {
+  const el = document.getElementById('p-err');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ══════════════════════
+// CATÉGORIES
+// ══════════════════════
+function goToCategories() {
+  const j = joueurs[myKey];
+  if (j) document.getElementById('cat-bonjour').textContent = `Bonjour\u00a0${j.nom}\u00a0!`;
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  const cats = Object.keys(QUIZ_DATA);
+  cats.forEach(id => {
+    const cat = QUIZ_DATA[id];
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn';
+    btn.style.borderColor = cat.color + '44';
+    btn.innerHTML = `<div class="cat-emoji">${cat.emoji}</div><div class="cat-lbl" style="color:${cat.color}">${cat.label}</div>`;
+    btn.onclick = () => startQuiz(id);
+    grid.appendChild(btn);
+  });
+  goPlayerScreen('ps-categories');
+}
+
+// ══════════════════════
+// QUIZ
+// ══════════════════════
+function startQuiz(catId) {
+  const cat = QUIZ_DATA[catId];
+  const shuffled = [...cat.questions].sort(() => Math.random() - .5);
+  qState = { questions: shuffled.slice(0, 5), idx: 0, score: 0, cat: catId };
+  if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'quiz', categorie: cat.label });
+  goPlayerScreen('ps-quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = qState.questions[qState.idx];
+  const n = qState.idx + 1;
+  document.getElementById('q-num').textContent = `Question ${n} / 5`;
+  document.getElementById('quiz-prog').style.width = (n / 5 * 100) + '%';
+  document.getElementById('q-text').textContent = q.q;
+  const letters = ['A', 'B', 'C', 'D'];
+  const opts = document.getElementById('q-opts');
+  opts.innerHTML = '';
+  q.o.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-opt';
+    btn.innerHTML = `<div class="q-opt-letter">${letters[i]}</div><span>${opt}</span>`;
+    btn.onclick = () => pickAnswer(i);
+    opts.appendChild(btn);
+  });
+  startChrono();
+}
+
+function startChrono() {
+  clearInterval(chronoInt);
+  let sec = cfg.duree;
+  const fill = document.getElementById('chrono-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  fill.className = 'chrono-fill';
+  setTimeout(() => {
+    fill.style.transition = `width ${cfg.duree}s linear`;
+    fill.style.width = '0%';
+  }, 50);
+  chronoInt = setInterval(() => {
+    sec--;
+    if (sec <= 3) fill.className = 'chrono-fill urgent';
+    if (sec <= 0) { clearInterval(chronoInt); pickAnswer(-1, true); }
+  }, 1000);
+}
+
+function pickAnswer(idx, timeout) {
+  clearInterval(chronoInt);
+  const q = qState.questions[qState.idx];
+  const btns = document.querySelectorAll('.q-opt');
+  btns.forEach(b => b.disabled = true);
+  if (!timeout) {
+    btns[q.c].classList.add('correct');
+    if (idx !== q.c) btns[idx].classList.add('wrong');
+    if (idx === q.c) qState.score++;
+  } else {
+    btns[q.c].classList.add('correct');
+  }
+  setTimeout(() => {
+    qState.idx++;
+    if (qState.idx < 5) renderQuestion();
+    else showQuizResult();
+  }, 900);
+}
+
+function showQuizResult() {
+  const success = qState.score === 5;
+  document.getElementById('res-big').textContent = success ? '\uD83C\uDFC6' : '\uD83D\uDE05';
+  document.getElementById('res-msg').textContent = success ? `PARFAIT\u00a0! ${qState.score}/5` : `${qState.score}/5 correct`;
+  document.getElementById('res-sub').textContent = success
+    ? `Bravo\u00a0! Rends-toi au stand LUMIIA\u00a0\u2014 l\u2019animateur va te s\u00e9lectionner pour lancer la roue\u00a0!`
+    : `Il faut toutes les r\u00e9ussir pour lancer la roue. On retente\u00a0?`;
+  const btn = document.getElementById('res-action');
+  const btnChange = document.getElementById('res-change-cat');
+  if (success) {
+    btn.textContent = `\u2705 En attente du stand`;
+    btn.disabled = true;
+    btnChange.style.display = 'none';
+    if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'valide' });
+  } else {
+    btn.textContent = `\uD83D\uDD04 Retenter`;
+    btn.disabled = false;
+    btnChange.style.display = 'block';
+    if (db && myKey) db.ref(`${FB_PATH}/joueurs/${myKey}`).update({ status: 'inscrit' });
+  }
+  goPlayerScreen('ps-result');
+}
+
+function retryQuiz() { startQuiz(qState.cat); }
+
+function checkMyStatus() {
+  const j = joueurs[myKey];
+  if (!j) return;
+  if (j.status === 'gagne') {
+    goPlayerScreen('ps-attente');
+    document.getElementById('attente-msg').textContent = `Cadeau gagn\u00e9\u00a0!`;
+    document.getElementById('attente-sub').textContent = `Tu as gagn\u00e9\u00a0: ${j.lot || ''}. Merci d\u2019\u00eatre pass\u00e9 au stand LUMIIA\u00a0!`;
+  }
+}
+
+function restorePlayerState() {
+  const j = joueurs[myKey];
+  if (!j) return;
+  if (j.status === 'valide') {
+    goPlayerScreen('ps-attente');
+  } else if (j.status === 'gagne') {
+    checkMyStatus();
+  } else {
+    goToCategories();
+  }
+}
+
+function goToRouePlayer() {
+  drawWheel('player-canvas', 220, 0);
+  goPlayerScreen('ps-roue');
+}
+
+// ══════════════════════
+// ROUE — DESSIN
+// ══════════════════════
+const CIRC = 2 * Math.PI * 35;
+
+function getWheelSize() {
+  const c = document.getElementById('col-centre');
+  return Math.min((c ? c.offsetWidth : 600) - 80, 500);
+}
+
+function drawWheel(canvasId, size, angle) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const cx = size / 2, r = cx - 5;
+  const seg = (2 * Math.PI) / LOTS.length;
+  ctx.clearRect(0, 0, size, size);
+  // Halo
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cx,r+3,0,Math.PI*2);
-  ctx.strokeStyle='rgba(168,85,247,.3)';ctx.lineWidth=5;
-  ctx.shadowBlur=18;ctx.shadowColor='rgba(168,85,247,.45)';
+  ctx.beginPath(); ctx.arc(cx, cx, r + 2, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(168,85,247,.3)'; ctx.lineWidth = 4;
+  ctx.shadowBlur = 14; ctx.shadowColor = 'rgba(168,85,247,.4)';
   ctx.stroke(); ctx.restore();
-
-  SEGMENTS.forEach((seg_def, i) => {
-    const s = angle + i*seg;
-    const e = s + seg;
-    const mid = s + seg/2;
-
-    // Fond segment
+  // Segments
+  LOTS.forEach((lot, i) => {
+    const s = angle + i * seg, e = s + seg, mid = s + seg / 2;
     ctx.save();
-    ctx.beginPath(); ctx.moveTo(cx,cx);
-    ctx.arc(cx,cx,r,s,e); ctx.closePath();
-    ctx.fillStyle = seg_def.couleur;
-    ctx.shadowBlur = 0; ctx.fill();
-    ctx.strokeStyle='rgba(5,0,26,.8)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, cx);
+    ctx.arc(cx, cx, r, s, e); ctx.closePath();
+    ctx.fillStyle = LOT_COLORS[i]; ctx.fill();
+    ctx.strokeStyle = '#05001a'; ctx.lineWidth = 1.5; ctx.stroke();
     ctx.restore();
-
-    // Emoji + texte court
-    const tx = cx + Math.cos(mid)*r*0.68;
-    const ty = cx + Math.sin(mid)*r*0.68;
-    ctx.save();
-    ctx.translate(tx,ty); ctx.rotate(mid + Math.PI/2);
     // Emoji
-    ctx.font = (size*0.08)+'px serif';
-    ctx.textAlign='center'; ctx.textBaseline='bottom';
-    ctx.fillText(seg_def.emoji, 0, 0);
-    // Nom court
-    const shortNom = seg_def.nom.length>7 ? seg_def.nom.substring(0,7)+'.' : seg_def.nom;
-    ctx.font = 'bold '+(size*0.042)+'px Nunito, sans-serif';
-    ctx.fillStyle='rgba(255,255,255,.85)';
-    ctx.textBaseline='top';
-    ctx.fillText(shortNom, 0, 2);
+    const tx = cx + Math.cos(mid) * r * 0.65;
+    const ty = cx + Math.sin(mid) * r * 0.65;
+    ctx.save();
+    ctx.translate(tx, ty); ctx.rotate(mid + Math.PI / 2);
+    ctx.font = (size * 0.065) + 'px serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+    ctx.fillText(LOT_EMOJIS[i], 0, 0);
+    // Texte court
+    const short = lot.length > 12 ? lot.substring(0, 11) + '\u2026' : lot;
+    ctx.font = `bold ${size * 0.033}px Nunito, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.textBaseline = 'top';
+    ctx.fillText(short, 0, 2);
     ctx.restore();
   });
-
-  // Centre disc
-  const grd = ctx.createRadialGradient(cx,cx,0,cx,cx,r*0.17);
-  grd.addColorStop(0,'#4dd9e8'); grd.addColorStop(1,'#a855f7');
+  // Centre
+  const grd = ctx.createRadialGradient(cx, cx, 0, cx, cx, r * 0.15);
+  grd.addColorStop(0, '#4dd9e8'); grd.addColorStop(1, '#a855f7');
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx,cx,r*0.17,0,Math.PI*2);
-  ctx.fillStyle=grd;
-  ctx.shadowBlur=16;ctx.shadowColor='rgba(77,217,232,.6)';
+  ctx.beginPath(); ctx.arc(cx, cx, r * 0.15, 0, Math.PI * 2);
+  ctx.fillStyle = grd; ctx.shadowBlur = 12; ctx.shadowColor = 'rgba(77,217,232,.5)';
   ctx.fill(); ctx.restore();
 }
 
-function syncMiniWheel(){ drawWheel('player-wheel',220,wheelAngle); }
-function initWheels(){
-  const s = Math.min(document.getElementById('proj-centre').offsetWidth - 80, 520);
-  drawWheel('proj-wheel', s, wheelAngle);
-  drawWheel('player-wheel', 220, wheelAngle);
+// ══════════════════════
+// SÉLECTION JOUEUR (projection)
+// ══════════════════════
+function selectJoueur(key) {
+  if (joueurs[key] && joueurs[key].status !== 'valide') return;
+  joueurActif = key;
+  document.querySelectorAll('.j-row').forEach(r => r.classList.remove('selected'));
+  const el = document.getElementById('jr-' + key);
+  if (el) el.classList.add('selected');
+  if (db) db.ref(`${FB_PATH}/actif`).set(key);
+  showRoueProj(key);
 }
 
-/* ════════════════════════════════════════
-   SPIN LOGIC
-════════════════════════════════════════ */
-let isSpinning = false;
-const WHEEL_SIZE = () => {
-  const el = document.getElementById('proj-wheel');
-  return el ? el.width : 480;
-};
+function showRoueProj(key) {
+  joueurActif = key;
+  const j = joueurs[key];
+  const nom = j ? j.nom : '?';
+  document.getElementById('wait-msg').style.display = 'none';
+  const rz = document.getElementById('roue-zone');
+  rz.style.display = 'flex';
+  document.getElementById('roue-joueur-lbl').textContent = `\u2728 ${nom} \u2014 Lance la roue !`;
+  const sz = getWheelSize();
+  drawWheel('proj-canvas', sz, 0);
+  wheelAngle = 0;
+  document.getElementById('proj-spin-btn').disabled = false;
+}
 
-function spinWheel(){
-  if(isSpinning) return;
+// ══════════════════════
+// SPIN
+// ══════════════════════
+function spinProj() {
+  if (isSpinning || !joueurActif) return;
+  const target = Math.floor(Math.random() * LOTS.length);
+  if (db) db.ref(`${FB_PATH}/spin`).set({ result: target, joueurKey: joueurActif, ts: Date.now() });
+  else animateSpin(target, joueurActif);
+}
+
+function playerSpin() {
+  if (isSpinning) return;
+  document.getElementById('player-spin-btn').disabled = true;
+  const target = Math.floor(Math.random() * LOTS.length);
+  if (db && myKey) db.ref(`${FB_PATH}/spin`).set({ result: target, joueurKey: myKey, ts: Date.now() });
+  else animateSpin(target, myKey);
+}
+
+function animateSpin(target, joueurKey) {
+  if (isSpinning) return;
   isSpinning = true;
   document.getElementById('proj-spin-btn').disabled = true;
-  document.getElementById('player-spin-btn').disabled = true;
-  document.getElementById('btn-lancer').style.display = 'none';
-  document.getElementById('chrono-block').style.display = 'none';
-  const wc = document.getElementById('wheel-center');
-  wc.classList.add('spinning'); wc.textContent='…';
-
-  // Reset result card
-  document.getElementById('result-card').className='';
-  document.getElementById('result-card').style.cssText='';
-  document.getElementById('res-emoji').textContent='✦';
-  document.getElementById('res-titre').textContent='En cours…';
-  document.getElementById('res-type').textContent='';
-  document.getElementById('res-desc').textContent='';
-
-  // Segment cible aléatoire
-  const target = Math.floor(Math.random()*SEGMENTS.length);
-  const segAngle = (2*Math.PI)/SEGMENTS.length;
-  // Le pointeur est en haut (−PI/2). La cible doit se centrer sous le pointeur.
-  const targetCenter = target*segAngle + segAngle/2;
-  const stopAngle = -Math.PI/2 - targetCenter;
-  const totalRot = stopAngle + (10+Math.floor(Math.random()*5))*2*Math.PI;
+  const pCenter = document.getElementById('proj-center');
+  pCenter.textContent = '\u2026';
+  const seg = (2 * Math.PI) / LOTS.length;
+  const stopAngle = -Math.PI / 2 - (target * seg + seg / 2);
+  const totalRot = stopAngle + (9 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
   const dur = 4500;
   const t0 = performance.now();
-  const ws = WHEEL_SIZE();
+  const sz = getWheelSize();
 
-  if(cfg.sound) sfxTick();
-
-  function frame(now){
-    const p = Math.min((now-t0)/dur,1);
-    const eased = 1-Math.pow(1-p,3.8);
-    const a = eased*totalRot;
-    wheelAngle = a%(2*Math.PI);
-    drawWheel('proj-wheel',ws,wheelAngle);
-    drawWheel('player-wheel',220,wheelAngle);
-    if(p<1){
-      if(cfg.sound && Math.random()<0.06) sfxTick();
-      requestAnimationFrame(frame);
-    } else {
-      wheelAngle = totalRot%(2*Math.PI);
-      drawWheel('proj-wheel',ws,wheelAngle);
-      drawWheel('player-wheel',220,wheelAngle);
-      setTimeout(()=>onSpinResult(target),300);
-    }
+  function frame(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const eased = 1 - Math.pow(1 - p, 3.8);
+    const a = eased * totalRot;
+    wheelAngle = a % (2 * Math.PI);
+    drawWheel('proj-canvas', sz, wheelAngle);
+    drawWheel('player-canvas', 220, wheelAngle);
+    if (p < 1) requestAnimationFrame(frame);
+    else onSpinEnd(target, joueurKey);
   }
   requestAnimationFrame(frame);
-
-  // Firebase broadcast
-  if(db) db.ref(fbPath()+'/state').set({spinning:true,timestamp:Date.now()});
 }
 
-function onSpinResult(targetIdx){
-  const seg = SEGMENTS[targetIdx];
+function onSpinEnd(target, joueurKey) {
+  wheelAngle = (-Math.PI / 2 - (target * (2 * Math.PI) / LOTS.length + (2 * Math.PI) / LOTS.length / 2)) % (2 * Math.PI);
+  drawWheel('proj-canvas', getWheelSize(), wheelAngle);
+  drawWheel('player-canvas', 220, wheelAngle);
   isSpinning = false;
-  const wc = document.getElementById('wheel-center');
-  wc.classList.remove('spinning'); wc.textContent='SPIN';
-  document.getElementById('proj-spin-btn').disabled = false;
-  document.getElementById('player-spin-btn').disabled = false;
-
-  if(cfg.sound) sfxResult();
-
-  // Update right card
-  const card = document.getElementById('result-card');
-  const typeClass = {jeu:'active-jeu',cadeau:'active-cadeau',gage:'active-gage'}[seg.type]||'active-jeu';
-  card.className = typeClass;
-  card.style.borderColor = seg.couleur+'88';
-  card.style.boxShadow = '0 0 40px '+seg.couleur+'33';
-  document.getElementById('res-emoji').textContent = seg.emoji;
-  document.getElementById('res-emoji').style.animation = 'none';
-  void document.getElementById('res-emoji').offsetWidth;
-  document.getElementById('res-emoji').style.animation = '';
-  document.getElementById('res-type').textContent = { jeu:'Mini-jeu', cadeau:'Cadeau direct', gage:'Gage' }[seg.type]||'';
-  document.getElementById('res-titre').textContent = seg.nom;
-  document.getElementById('res-titre').style.color = seg.couleur;
-  document.getElementById('res-desc').textContent = seg.desc;
-
-  // Bouton lancer (uniquement pour jeux avec chrono)
-  const btnL = document.getElementById('btn-lancer');
-  if(seg.type==='jeu'){
-    btnL.style.display='block';
-    btnL.disabled=false;
-    btnL.textContent='▶ LANCER · '+seg.duree+'s';
-    chronoSec = seg.duree;
-  } else {
-    btnL.style.display='none';
-    if(cfg.overlay) showOverlay(seg);
-    if(cfg.confetti && seg.type==='cadeau') launchConfetti();
-  }
-
+  const lot = LOTS[target];
+  const j = joueurs[joueurKey];
+  const nom = j ? j.nom : '?';
+  // Sauvegarder
+  if (db && joueurKey) db.ref(`${FB_PATH}/joueurs/${joueurKey}`).update({ status: 'gagne', lot });
+  // Résultat colonne droite
+  document.getElementById('res-emoji').textContent = LOT_EMOJIS[target];
+  document.getElementById('res-nom').textContent = nom;
+  document.getElementById('res-nom').style.color = LOT_COLORS[target];
+  document.getElementById('res-lot').textContent = lot;
   // Historique
-  history.unshift({seg, time: new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})});
-  buildHistory();
-
-  // Player view result
-  const prb = document.getElementById('player-result-box');
-  prb.querySelector('.player-res-emoji').textContent = seg.emoji;
-  prb.querySelector('.player-res-titre').textContent = seg.nom;
-  prb.querySelector('.player-res-titre').style.color = seg.couleur;
-  prb.querySelector('.player-res-desc').textContent = seg.desc;
-
-  // Firebase
-  if(db) db.ref(fbPath()+'/state').set({
-    spinning:false, result:targetIdx,
-    segNom:seg.nom, segType:seg.type, segEmoji:seg.emoji,
-    timestamp:Date.now()
-  });
+  hist.unshift({ nom, lot, emoji: LOT_EMOJIS[target], color: LOT_COLORS[target] });
+  buildHist();
+  // Overlay
+  setTimeout(() => showOverlay(nom, lot, LOT_EMOJIS[target]), 400);
+  launchConfetti();
+  // Reset actif
+  if (db) db.ref(`${FB_PATH}/actif`).remove();
+  document.getElementById('proj-spin-btn').disabled = false;
+  document.getElementById('proj-center').textContent = 'SPIN';
+  joueurActif = null;
 }
 
-function playerRequestSpin(){
-  if(!cfg.playerSpin){ alert('Le lancement par les joueurs n\'est pas activé.\nActive-le dans Settings → Joueurs peuvent lancer la roue.'); return; }
-  spinWheel();
+// ══════════════════════
+// OVERLAY
+// ══════════════════════
+function showOverlay(nom, lot, emoji) {
+  document.getElementById('ov-r-emoji').textContent = emoji;
+  document.getElementById('ov-r-joueur').textContent = nom;
+  document.getElementById('ov-r-lot').textContent = lot;
+  document.getElementById('ov-result').classList.add('show');
+}
+function closeOverlay() {
+  document.getElementById('ov-result').classList.remove('show');
+  document.getElementById('wait-msg').style.display = '';
+  document.getElementById('roue-zone').style.display = 'none';
 }
 
-/* ════════════════════════════════════════
-   CHRONO
-════════════════════════════════════════ */
-function lancerJeu(){
-  const seg = history[0]?.seg;
-  if(!seg) return;
-  document.getElementById('btn-lancer').disabled = true;
-  document.getElementById('chrono-block').style.display='block';
-  if(cfg.overlay) showOverlay(seg);
-  if(cfg.sound) sfxGo();
-  startChrono(seg.duree || parseInt(document.getElementById('sp-duree').value)||30);
-}
-function startChrono(s){
-  chronoSec = s;
-  updChrono();
-  clearInterval(chronoInt);
-  chronoInt = setInterval(()=>{
-    chronoSec--;
-    updChrono();
-    if(chronoSec<=0){ clearInterval(chronoInt); if(cfg.sound) sfxBuzzer(); }
-    else if(chronoSec<=5 && cfg.sound) sfxBip();
-  },1000);
-}
-function updChrono(){
-  const el = document.getElementById('chrono-num');
-  el.textContent = chronoSec;
-  el.className = chronoSec<=5 ? 'urgent' : '';
-}
-
-/* ════════════════════════════════════════
-   OVERLAY PLEIN ÉCRAN
-════════════════════════════════════════ */
-function showOverlay(seg){
-  document.getElementById('ro-emoji').textContent=seg.emoji;
-  document.getElementById('ro-type').textContent={ jeu:'Mini-jeu', cadeau:'Cadeau direct !', gage:'Gage !' }[seg.type]||'';
-  document.getElementById('ro-titre').textContent=seg.nom;
-  document.getElementById('ro-titre').className='';
-  document.getElementById('ro-titre').classList.add('t-'+seg.type);
-  document.getElementById('ro-desc').textContent=seg.desc;
-  document.getElementById('result-overlay').classList.add('show');
-  if(cfg.confetti && seg.type==='cadeau') launchConfetti();
-}
-function closeOverlay(){
-  document.getElementById('result-overlay').classList.remove('show');
-}
-
-/* ════════════════════════════════════════
-   HISTORIQUE
-════════════════════════════════════════ */
-function buildHistory(){
-  const c=document.getElementById('lot-history');
-  if(!history.length){ c.innerHTML='<div style="font-size:.72rem;color:var(--dim);text-align:center;padding:8px;">—</div>'; return; }
-  c.innerHTML=history.slice(0,12).map(h=>`
-    <div class="lot-item">
-      <span class="lot-item-emoji">${h.seg.emoji}</span>
-      <span class="lot-item-name" style="color:${h.seg.couleur}">${h.seg.nom}</span>
-      <span class="lot-item-time">${h.time}</span>
-    </div>`).join('');
-}
-
-/* ════════════════════════════════════════
-   JOUEURS
-════════════════════════════════════════ */
-function buildJoueursList(){
-  document.getElementById('nb-joueurs').textContent=joueurs.length;
-  const c=document.getElementById('joueurs-list');
-  if(!joueurs.length){
-    c.innerHTML='<div style="padding:20px;text-align:center;font-size:.8rem;color:var(--dim);">Aucun participant…</div>';
+// ══════════════════════
+// RENDER JOUEURS
+// ══════════════════════
+function renderJoueurs() {
+  document.getElementById('nb-j').textContent = Object.keys(joueurs).length;
+  const c = document.getElementById('j-list');
+  const entries = Object.entries(joueurs).sort((a, b) => (b[1].ts || 0) - (a[1].ts || 0));
+  if (!entries.length) {
+    c.innerHTML = `<div style="padding:20px;text-align:center;font-size:.78rem;color:var(--dim);">En attente de participants\u2026</div>`;
     return;
   }
-  c.innerHTML='';
-  joueurs.forEach((j,i)=>{
-    const d=document.createElement('div');
-    d.className='j-card';
-    d.innerHTML=`
-      <div class="j-num">${i+1}</div>
-      <div style="flex:1;min-width:0;">
-        <div class="j-name">${esc(j.prenom||j.nom||'?')}</div>
-        ${j.entreprise?`<div class="j-co">${esc(j.entreprise)}</div>`:''}
-      </div>
+  c.innerHTML = '';
+  entries.forEach(([key, j]) => {
+    const div = document.createElement('div');
+    div.className = `j-row ${j.status || 'inscrit'}`;
+    div.id = 'jr-' + key;
+    if (j.status === 'valide') div.onclick = () => selectJoueur(key);
+    const badgeMap = {
+      inscrit: `<span class="j-badge b-inscrit">Inscrit</span>`,
+      quiz: `<span class="j-badge b-quiz">\u23F3 Quiz en cours</span>`,
+      valide: `<span class="j-badge b-valide">\u2705 Valid\u00e9 \u2014 cliquer pour la roue</span>`,
+      perdu: `<span class="j-badge b-perdu">Tentative\u2026</span>`,
+      roue: `<span class="j-badge b-roue">\uD83C\uDF89 Roue!</span>`,
+      gagne: `<span class="j-badge b-gagne">\uD83C\uDFC6 ${j.lot || 'Gagn\u00e9'}</span>`,
+    };
+    div.innerHTML = `
+      <div class="j-nom">${esc(j.nom)}</div>
+      <div class="j-co">${esc(j.co || '')}</div>
+      ${badgeMap[j.status || 'inscrit'] || ''}
     `;
-    c.appendChild(d);
+    c.appendChild(div);
   });
 }
 
-function addJoueur(){
-  const nom=document.getElementById('sp-add-nom').value.trim();
-  const co=document.getElementById('sp-add-co').value.trim();
-  if(!nom) return;
-  const j={prenom:nom,entreprise:co,timestamp:Date.now()};
-  if(db){
-    db.ref(fbPath()+'/joueurs').push(j);
-  } else {
-    j.key=Date.now()+'';
-    joueurs.push(j);
-    buildJoueursList();
-    buildSpJoueurs();
-  }
-  document.getElementById('sp-add-nom').value='';
-  document.getElementById('sp-add-co').value='';
+function updateStats() {
+  const vals = Object.values(joueurs);
+  document.getElementById('s-inscrits').textContent = vals.length;
+  document.getElementById('s-valides').textContent = vals.filter(j => j.status === 'valide').length;
+  document.getElementById('s-gagnes').textContent = vals.filter(j => j.status === 'gagne').length;
+  document.getElementById('s-encours').textContent = vals.filter(j => j.status === 'quiz').length;
 }
 
-function removeJoueur(key){
-  if(db) db.ref(fbPath()+'/joueurs/'+key).remove();
-  else { joueurs=joueurs.filter(j=>j.key!==key); buildJoueursList(); buildSpJoueurs(); }
-}
-
-function buildSpJoueurs(){
-  document.getElementById('sp-nb-joueurs').textContent=joueurs.length;
-  const c=document.getElementById('sp-joueurs-list');
-  if(!joueurs.length){ c.innerHTML='<div style="font-size:.75rem;color:var(--dim);padding:6px 0;">Aucun participant.</div>'; return; }
-  c.innerHTML=joueurs.map(j=>`
-    <div class="sp-joueur-row">
-      <div class="sp-joueur-name">${esc(j.prenom||j.nom||'?')} <span class="sp-joueur-co">${esc(j.entreprise||'')}</span></div>
-      <button class="sp-del-btn" onclick="removeJoueur('${j.key||''}')">✕</button>
+function buildHist() {
+  const c = document.getElementById('hist-list');
+  if (!hist.length) { c.innerHTML = `<div style="font-size:.68rem;color:var(--dim);text-align:center;padding:5px;">\u2014</div>`; return; }
+  c.innerHTML = hist.slice(0, 8).map(h => `
+    <div class="hist-item">
+      <div class="hist-dot" style="background:${h.color}"></div>
+      <div class="hist-txt">${esc(h.nom)} \u2014 ${esc(h.lot)}</div>
+      <span>${h.emoji}</span>
     </div>`).join('');
 }
 
-/* ════════════════════════════════════════
-   FIREBASE LISTEN
-════════════════════════════════════════ */
-function fbListen(){
-  if(!db) return;
-  db.ref(fbPath()+'/joueurs').on('value',snap=>{
-    joueurs=[];
-    snap.forEach(c=>{ const v=c.val(); if(v) joueurs.push({key:c.key,...v}); });
-    buildJoueursList();
-    buildSpJoueurs();
+// ══════════════════════
+// SETTINGS
+// ══════════════════════
+function toggleSettings() {
+  const panel = document.getElementById('settings-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) buildSettingsUI();
+}
+
+function buildSettingsUI() {
+  const c = document.getElementById('sp-lots');
+  c.innerHTML = '';
+  LOTS.forEach((lot, i) => {
+    const row = document.createElement('div');
+    row.className = 'sp-lot-row';
+    row.innerHTML = `
+      <div class="sp-lot-num" style="background:${LOT_COLORS[i]}">${i+1}</div>
+      <input class="sp-input" id="sp-lot-${i}" value="${esc(lot)}" style="flex:1">
+    `;
+    c.appendChild(row);
   });
+  document.getElementById('sp-duree').value = cfg.duree;
 }
 
-/* ════════════════════════════════════════
-   RESET
-════════════════════════════════════════ */
-function resetSpin(){
-  if(!confirm('Remettre à zéro ? Historique effacé.')) return;
-  clearInterval(chronoInt);
-  isSpinning=false;
-  history=[];
-  buildHistory();
-  wheelAngle=0;
-  initWheels();
-  document.getElementById('result-card').className='';
-  document.getElementById('res-emoji').textContent='✦';
-  document.getElementById('res-titre').textContent='Tourne la roue !';
-  document.getElementById('res-type').textContent='En attente';
-  document.getElementById('res-desc').textContent='Appuie sur le bouton ou sur le centre de la roue pour commencer.';
-  document.getElementById('res-titre').style.color='var(--dim)';
-  document.getElementById('btn-lancer').style.display='none';
-  document.getElementById('chrono-block').style.display='none';
-  document.getElementById('proj-spin-btn').disabled=false;
-  document.getElementById('player-spin-btn').disabled=false;
-  document.getElementById('player-result-box').querySelector('.player-res-emoji').textContent='✦';
-  document.getElementById('player-result-box').querySelector('.player-res-titre').textContent='En attente…';
-  document.getElementById('player-result-box').querySelector('.player-res-titre').style.color='var(--dim)';
-  document.getElementById('player-result-box').querySelector('.player-res-desc').textContent='La roue n\'a pas encore tourné.';
-  if(db) db.ref(fbPath()+'/state').set({spinning:false,result:null,timestamp:Date.now()});
-}
-
-/* ════════════════════════════════════════
-   SETTINGS
-════════════════════════════════════════ */
-function toggleSettings(){
-  document.getElementById('settings-panel').classList.toggle('open');
-  buildSegEditor();
-  buildSpJoueurs();
-}
-
-function toggle(btnId, key){
-  const btn=document.getElementById(btnId);
-  btn.classList.toggle('on');
-  cfg[key]=btn.classList.contains('on');
-}
-
-function buildSegEditor(){
-  const c=document.getElementById('seg-editor');
-  const cols=['#7c3aed','#0284c7','#0f766e','#b45309','#0369a1','#7e22ce','#15803d','#9f1239'];
-  c.innerHTML=SEGMENTS.map((s,i)=>`
-    <div class="seg-row" style="border-color:${s.couleur}44">
-      <div class="seg-num" style="background:${s.couleur}">${i+1}</div>
-      <input class="seg-name-inp" id="seg-nom-${i}" value="${esc(s.nom)}" maxlength="20" placeholder="Nom">
-      <select class="seg-type-sel" id="seg-type-${i}">
-        <option value="jeu" ${s.type==='jeu'?'selected':''}>🎮 Jeu</option>
-        <option value="cadeau" ${s.type==='cadeau'?'selected':''}>🎁 Cadeau</option>
-        <option value="gage" ${s.type==='gage'?'selected':''}>😈 Gage</option>
-      </select>
-      <input class="seg-emoji-inp" id="seg-emoji-${i}" value="${s.emoji}" maxlength="2">
-    </div>`).join('');
-}
-
-function saveSettings(){
-  // Récupérer segments
-  SEGMENTS.forEach((s,i)=>{
-    const nom=document.getElementById('seg-nom-'+i)?.value?.trim();
-    const type=document.getElementById('seg-type-'+i)?.value;
-    const emoji=document.getElementById('seg-emoji-'+i)?.value?.trim();
-    if(nom) s.nom=nom;
-    if(type) s.type=type;
-    if(emoji) s.emoji=emoji;
-    // Textes depuis champs
-  });
-  SEGMENTS[6].desc = document.getElementById('sp-cadeau-txt').value||SEGMENTS[6].desc;
-  SEGMENTS[7].desc = document.getElementById('sp-gage-txt').value||SEGMENTS[7].desc;
-  cfg.duree = parseInt(document.getElementById('sp-duree').value)||30;
-  // Redessiner
-  initWheels();
+function saveSettings() {
+  LOTS = Array.from({length: 8}, (_, i) => document.getElementById(`sp-lot-${i}`)?.value || LOTS[i]);
+  cfg.duree = parseInt(document.getElementById('sp-duree').value) || 15;
+  if (db) db.ref(`${FB_PATH}/settings`).set({ lots: LOTS, duree: cfg.duree });
+  drawWheel('proj-canvas', getWheelSize(), wheelAngle);
+  drawWheel('player-canvas', 220, wheelAngle);
   toggleSettings();
 }
 
-/* ════════════════════════════════════════
-   CONFETTIS
-════════════════════════════════════════ */
-function launchConfetti(){
-  const wrap=document.getElementById('confetti-wrap');
-  wrap.innerHTML='';
-  const colors=['#b8ff3c','#4dd9e8','#d946ef','#ffd700','#a855f7','#ff6b9d'];
-  for(let i=0;i<80;i++){
-    const d=document.createElement('div');
-    d.className='conf';
-    d.style.cssText=`
-      left:${Math.random()*100}%;
-      background:${colors[i%colors.length]};
-      width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;
-      animation-duration:${1.8+Math.random()*2}s;
-      animation-delay:${Math.random()*.8}s;
-      border-radius:${Math.random()>0.5?'50%':'2px'};
-    `;
+function exportCSV() {
+  const vals = Object.values(joueurs);
+  if (!vals.length) { alert(`Aucune donn\u00e9e`); return; }
+  const hdr = ['Pr\u00e9nom','Entreprise','Email','Statut','Lot'];
+  const rows = vals.map(j => [j.nom, j.co, j.email, j.status, j.lot || '']);
+  const csv = [hdr,...rows].map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `lumiia-reda-spin-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ══════════════════════
+// CONFETTIS
+// ══════════════════════
+function launchConfetti() {
+  const wrap = document.getElementById('confetti-wrap');
+  wrap.innerHTML = '';
+  const colors = ['#b8ff3c','#4dd9e8','#d946ef','#ffd700','#a855f7'];
+  for (let i = 0; i < 70; i++) {
+    const d = document.createElement('div');
+    d.className = 'conf';
+    d.style.cssText = `left:${Math.random()*100}%;top:-10px;background:${colors[i%colors.length]};
+      width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;
+      animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.5}s;
+      border-radius:${Math.random()>.5?'50%':'2px'};`;
     wrap.appendChild(d);
   }
-  setTimeout(()=>wrap.innerHTML='',4000);
+  setTimeout(() => wrap.innerHTML = '', 5000);
 }
 
-/* ════════════════════════════════════════
-   AUDIO
-════════════════════════════════════════ */
-let _ac=null;
-function ac(){ if(!_ac) _ac=new(window.AudioContext||window.webkitAudioContext)(); return _ac; }
-function tone(f,t,d,v=.25,delay=0){
-  if(!cfg.sound) return;
-  try{
-    const ctx=ac(),o=ctx.createOscillator(),g=ctx.createGain();
-    o.connect(g);g.connect(ctx.destination);
-    o.type=t;o.frequency.setValueAtTime(f,ctx.currentTime+delay);
-    g.gain.setValueAtTime(v,ctx.currentTime+delay);
-    g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+delay+d);
-    o.start(ctx.currentTime+delay);o.stop(ctx.currentTime+delay+d+.05);
-  }catch(e){}
+// ══════════════════════
+// RESET
+// ══════════════════════
+function resetAll() {
+  if (!confirm(`R\u00e9initialiser toutes les donn\u00e9es\u00a0?`)) return;
+  if (db) db.ref(FB_PATH).update({ joueurs: null, actif: null, spin: null });
+  joueurs = {}; hist = []; joueurActif = null;
+  renderJoueurs(); updateStats(); buildHist();
+  document.getElementById('wait-msg').style.display = '';
+  document.getElementById('roue-zone').style.display = 'none';
+  document.getElementById('res-nom').textContent = 'Aucun tirage';
+  document.getElementById('res-nom').style.color = 'var(--dim)';
+  document.getElementById('res-lot').textContent = `Lance la roue pour un joueur valid\u00e9`;
 }
-function sfxTick(){ tone(500+Math.random()*300,'square',.04,.12); }
-function sfxResult(){ [440,550,660,880].forEach((f,i)=>tone(f,'triangle',.3,.2,i*.07)); }
-function sfxGo(){ tone(880,'square',.15,.3);tone(1100,'square',.15,.3,.15); }
-function sfxBip(){ tone(880,'square',.08,.4); }
-function sfxBuzzer(){ [220,180].forEach((f,i)=>tone(f,'sawtooth',.4,.4,i*.1)); }
 
-/* ════════════════════════════════════════
-   UTILS
-════════════════════════════════════════ */
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+// ══════════════════════
+// UTILS
+// ══════════════════════
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded', ()=>{
-  initFB();
-  setTimeout(initWheels, 100);
-  window.addEventListener('resize', initWheels);
+window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('resize', () => {
+  if (!isPlayerMode) drawWheel('proj-canvas', getWheelSize(), wheelAngle);
 });
 </script>
 </body>
